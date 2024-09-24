@@ -39,3 +39,9 @@ func CheckHealth(ctx *fiber.Ctx) error {
 	ctx.Status(fiber.StatusOK)
 	return nil
 }
+
+func ErrorHealthCheck(ctx *fiber.Ctx)error {
+	ctx.Set("cache-control","no-cache")
+	ctx.Status(fiber.StatusNotFound)
+	return nil
+}

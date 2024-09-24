@@ -6,5 +6,6 @@ import (
 )
 
 func HealthRoute(app *fiber.App){
-	app.All("/healthz",controllers.CheckHealth)
+	app.All("/healthz/",controllers.CheckHealth)
+	app.All("healthz/*",controllers.ErrorHealthCheck)
 }
