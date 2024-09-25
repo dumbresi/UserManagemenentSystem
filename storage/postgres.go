@@ -48,3 +48,17 @@ func NewConnection() {
     }
 
 }
+
+func PingDb() error{
+	sqlDB, err:= db.DB()
+	if(err!=nil){
+		return fmt.Errorf("failed to retrieve database object: %w", err)
+	}
+
+	err=sqlDB.Ping()
+	if err != nil {
+		return fmt.Errorf("failed to ping database: %w", err)
+	}
+
+	return nil
+}

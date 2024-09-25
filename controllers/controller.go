@@ -3,6 +3,7 @@ package controllers
 import (
 	"slices"
 
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -35,6 +36,10 @@ func CheckHealth(ctx *fiber.Ctx) error {
 	if len(ctx.Queries()) > 0 {
 		ctx.Status(fiber.StatusBadRequest)
 		return nil
+	}
+	err:=storage.PingDb()
+	if(err!=nil){
+		ctx.Status(fiber.StatusServiceUnavailable)
 	}
 	ctx.Status(fiber.StatusOK)
 	return nil
