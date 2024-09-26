@@ -40,6 +40,7 @@ func CheckHealth(ctx *fiber.Ctx) error {
 	err:=storage.PingDb()
 	if(err!=nil){
 		ctx.Status(fiber.StatusServiceUnavailable)
+		return nil
 	}
 	ctx.Status(fiber.StatusOK)
 	return nil
