@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -18,13 +19,14 @@ type Config struct{
 	SSLMode string
 }
 
-var db *gorm.DB
+var Database *gorm.DB
 
-func NewConnection() {
+func NewConnection() error {
 
 	err:=godotenv.Load(".env")
 	if(err!=nil){
 		log.Fatal()
+		return err
 	}
 
 	config:=Config{
@@ -41,16 +43,19 @@ func NewConnection() {
 		config.Host,config.Port,config.User,config.Password,config.DbName,config.SSLMode,
 	)
 	var er error
-	db, er=gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	Database, er=gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if er != nil {
         log.Fatal("Failed to connect to the database", err)
+		return er
     }
+	MigrateDb()
 
+	return nil
 }
 
 func PingDb() error{
-	sqlDB, err:= db.DB()
+	sqlDB, err:= Database.DB()
 	if(err!=nil){
 		return fmt.Errorf("failed to retrieve database object: %w", err)
 	}
@@ -61,4 +66,8 @@ func PingDb() error{
 	}
 
 	return nil
+}
+
+func MigrateDb(){
+	models.MigrateUser(Database)
 }

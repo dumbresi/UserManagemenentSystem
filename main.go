@@ -14,6 +14,8 @@ func main(){
 	app:=fiber.New()
 
 	routes.HealthRoute(app)
+	routes.GetUser(app)
+	routes.CreateUser(app)
 
 	app.Listen(":3000")
 }
