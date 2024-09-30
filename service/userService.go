@@ -13,7 +13,7 @@ func ValidateUser(ctx *fiber.Ctx, email string, password string) (bool,models.Us
 	user, err := storage.GetUserByEmail(ctx, email)
 	if err != nil {
 		log.Error().Err(err).Msg("Error getting the user by email")
-		return false,models.User{}, errors.New("Cannot find user by email")
+		return false,models.User{}, errors.New("cannot find user by email")
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
