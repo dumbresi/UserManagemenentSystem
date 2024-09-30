@@ -52,13 +52,17 @@ func NewConnection() error {
 		log.Fatal("Failed to connect to the database", err)
 		return er
 	}
-	MigrateDb()
+	er=MigrateDb()
+	if(er!=nil){
+		log.Fatal("Error migrating the database")
+	}
 
 	return nil
 }
 
-func MigrateDb() {
-	models.MigrateUser(Database)
+func MigrateDb()error {
+	err:=models.MigrateUser(Database)
+	return err
 }
 
 func PingDb() error {

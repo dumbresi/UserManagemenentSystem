@@ -32,10 +32,9 @@ func GetUser(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(userResp)
 }
+
 func CreateUser(ctx *fiber.Ctx) error {
 	var user = new(models.User)
-
-	// err := ctx.BodyParser(user)
 	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
 	j.DisallowUnknownFields()
 	err := j.Decode(&user)
@@ -57,6 +56,13 @@ func CreateUser(ctx *fiber.Ctx) error {
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"error": "Could not hash password",
+		})
+	}
+	
+	emailValidation:=helper.ValidateEmail(user.Email)
+	if(!emailValidation){
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email not valid",
 		})
 	}
 
