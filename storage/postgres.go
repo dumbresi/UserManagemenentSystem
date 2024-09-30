@@ -28,7 +28,7 @@ func NewConnection() error {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal()
+		log.Fatal("error loading env")
 		return err
 	}
 
@@ -52,13 +52,17 @@ func NewConnection() error {
 		log.Fatal("Failed to connect to the database", err)
 		return er
 	}
-	MigrateDb()
+	er=MigrateDb()
+	if(er!=nil){
+		log.Println("Error migrating the database")
+	}
 
 	return nil
 }
 
-func MigrateDb() {
-	models.MigrateUser(Database)
+func MigrateDb()error {
+	err:=models.MigrateUser(Database)
+	return err
 }
 
 func PingDb() error {

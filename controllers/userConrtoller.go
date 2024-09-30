@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -30,19 +32,20 @@ func GetUser(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(http.StatusOK).JSON(userResp)
 }
-func CreateUser(ctx *fiber.Ctx) error {
-	var user = new(models.UserRequest)
 
-	err := ctx.BodyParser(user)
+func CreateUser(ctx *fiber.Ctx) error {
+	var user = new(models.User)
+	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
+	j.DisallowUnknownFields()
+	err := j.Decode(&user)
+
 	if err != nil {
-		log.Fatal("Failed to parse Response")
+		log.Println("Failed to parse Response")
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Incorrect Request Body"})
 	}
 
 	// validating the fields
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
-		log.Fatal("firstname:"+user.FirstName)
-		log.Fatal("lastname:"+user.LastName)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "First name, last name, email, and password are required fields",
 		})
@@ -53,14 +56,21 @@ func CreateUser(ctx *fiber.Ctx) error {
 			"error": "Could not hash password",
 		})
 	}
+	
+	emailValidation:=helper.ValidateEmail(user.Email)
+	if(!emailValidation){
+		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "Email not valid",
+		})
+	}
 
 	user.Password = hashedPassword
 
 	err = storage.Database.Create(&user).Error
 	if err != nil {
-		log.Fatal("Cannot save the user to Database")
+		log.Println("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusCreated)
 	return nil
 }

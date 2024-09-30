@@ -6,16 +6,13 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-
-func main(){
+func main() {
 
 	storage.NewConnection()
 
-	app:=fiber.New()
+	app := fiber.New()
 
-	routes.HealthRoute(app)
-	routes.GetUser(app)
-	routes.CreateUser(app)
+	routes.SetupRoutes(app)
 
 	app.Listen(":3000")
 }

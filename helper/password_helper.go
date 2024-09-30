@@ -2,6 +2,7 @@ package helper
 
 import (
     "golang.org/x/crypto/bcrypt"
+    "regexp"
 )
 
 // HashPassword hashes the given password with bcrypt and returns the hashed password or an error.
@@ -18,4 +19,10 @@ func HashPassword(password string) (string, error) {
 func CheckPassword(hashedPassword, password string) bool {
     err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
     return err == nil
+}
+
+func ValidateEmail(email string) bool{
+    regexPattern:=`^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`
+    re:= regexp.MustCompile(regexPattern)
+    return re.MatchString(email)
 }
