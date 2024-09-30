@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -31,9 +33,13 @@ func GetUser(ctx *fiber.Ctx) error {
 	return ctx.Status(http.StatusOK).JSON(userResp)
 }
 func CreateUser(ctx *fiber.Ctx) error {
-	var user = new(models.UserRequest)
+	var user = new(models.User)
 
-	err := ctx.BodyParser(user)
+	// err := ctx.BodyParser(user)
+	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
+	j.DisallowUnknownFields()
+	err := j.Decode(&user)
+
 	if err != nil {
 		log.Fatal("Failed to parse Response")
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Incorrect Request Body"})
@@ -61,6 +67,6 @@ func CreateUser(ctx *fiber.Ctx) error {
 		log.Fatal("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusCreated)
 	return nil
 }
