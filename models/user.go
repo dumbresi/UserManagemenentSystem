@@ -40,7 +40,7 @@ type UserResponse struct {
 func MigrateUser(db *gorm.DB) error {
 	err := db.AutoMigrate(&User{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
 		return err
 	}
 	return nil

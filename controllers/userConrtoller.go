@@ -40,14 +40,12 @@ func CreateUser(ctx *fiber.Ctx) error {
 	err := j.Decode(&user)
 
 	if err != nil {
-		log.Fatal("Failed to parse Response")
+		log.Println("Failed to parse Response")
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Incorrect Request Body"})
 	}
 
 	// validating the fields
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
-		log.Fatal("firstname:"+user.FirstName)
-		log.Fatal("lastname:"+user.LastName)
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "First name, last name, email, and password are required fields",
 		})
@@ -70,7 +68,7 @@ func CreateUser(ctx *fiber.Ctx) error {
 
 	err = storage.Database.Create(&user).Error
 	if err != nil {
-		log.Fatal("Cannot save the user to Database")
+		log.Println("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
 	ctx.Status(http.StatusCreated)
