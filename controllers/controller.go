@@ -16,8 +16,6 @@ func CheckHealth(ctx *fiber.Ctx) error {
 		return nil
 	}
 
-	
-
 	if len(ctx.Body()) > 0 {
 		ctx.Status(fiber.StatusBadRequest)
 		return nil
