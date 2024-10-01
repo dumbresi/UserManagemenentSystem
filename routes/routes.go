@@ -11,4 +11,5 @@ func SetupRoutes(app *fiber.App) {
 	app.All("healthz/*", controllers.ErrorHealthCheck)
 	app.Get("v1/user/self",middleware.BasicAuthMiddleware,controllers.GetUser)
 	app.Post("/v1/user",controllers.CreateUser)
+	app.Put("v1/user/self",middleware.BasicAuthMiddleware,controllers.UpdateUser)
 }
