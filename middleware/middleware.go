@@ -43,8 +43,7 @@ func BasicAuthMiddleware(ctx *fiber.Ctx) error{
 	username := credentials[0]
 	password := credentials[1]
 	exist,user,validationerror:=service.ValidateUser(ctx,username,password); 
-	if exist==true {
-		// Credentials are valid, proceed to the next handler
+	if exist {
 		ctx.Locals("user",user)
 		return ctx.Next()
 	}

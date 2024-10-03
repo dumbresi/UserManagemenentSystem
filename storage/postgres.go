@@ -28,7 +28,7 @@ func NewConnection() error {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("error loading env")
+		log.Print("error loading env")
 		return err
 	}
 
