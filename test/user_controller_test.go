@@ -265,11 +265,13 @@ func TestUpdateUser(t *testing.T){
         resp, _ := app.Test(req)
 
         assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+
+        var updatedUser models.User
         
-        var updatedUser models.UserResponse
-        json.NewDecoder(resp.Body).Decode(&updatedUser)
-        assert.Equal(t, "Jane", updatedUser.FirstName)
-        assert.Equal(t, "Smith", updatedUser.LastName)
+	    storage.Database.Where("email = ?", user.Email).First(&updatedUser); 
+        fmt.Print(&updatedUser)
+        assert.Equal(t, "Jonny", updatedUser.FirstName)
+        assert.Equal(t, "Donny", updatedUser.LastName)
     })
     
 }
