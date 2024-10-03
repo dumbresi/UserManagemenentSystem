@@ -49,7 +49,7 @@ func NewConnection() error {
 	Database, er = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 
 	if er != nil {
-		log.Fatal("Failed to connect to the database", err)
+		log.Print("Failed to connect to the database", err)
 		return er
 	}
 	er=MigrateDb()
@@ -81,14 +81,14 @@ func PingDb() error {
 
 func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 	if Database == nil {
-		log.Default().Fatal("DB object is not initialized")
+		log.Print("DB object is not initialized")
 		return models.User{}, errors.New("DB object is not initialized")
 	}
 
 	var user models.User
 	err := Database.Where("email = ?", email).First(&user).Error; 
 	if err != nil {
-		log.Fatal("Error getting the user by username")
+		log.Print("Error getting the user by username")
 		return models.User{}, err
 	}
 	return user, nil

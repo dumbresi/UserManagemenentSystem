@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/controllers"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/middleware"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -145,11 +146,6 @@ func TestGetUser(t *testing.T) {
     app= fiber.New()
     storage.Database = setupTestDatabase()
 
-    // pass,er:=helper.HashPassword("password123")
-    // if(er!=nil){
-    //     log.Print("error hashing password")
-    // }
-
     user = models.User{
         Email:     "test@example.com",
         Password:  "password123", 
@@ -240,14 +236,62 @@ func TestGetUser(t *testing.T) {
     })
 }
 
-func TestMain(m *testing.M) {
+func TestUpdateUser(t *testing.T){
+    app= fiber.New()
+    storage.Database = setupTestDatabase()
+
+    app.Put("v1/user/self",middleware.BasicAuthMiddleware,controllers.UpdateUser)
+
+    user = models.User{
+        Email:     "test@example.com",
+        Password:  "password123", 
+        FirstName: "John",
+        LastName:  "Doe",
+    }
+
+    createAuthHeader := func(username, password string) string {
+        auth := username + ":" + password
+        return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
+    }
+
+    t.Run("User Update Successful", func(t *testing.T) {
+        payload := `{
+            "first_name": "Jonny",
+            "last_name": "Donny"
+        }`
+        req := httptest.NewRequest("PUT", "/v1/user/self", strings.NewReader(payload))
+        req.Header.Set("Content-Type", "application/json")
+        req.Header.Set("Authorization", createAuthHeader(user.Email, user.Password))
+        resp, _ := app.Test(req)
+
+        assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+        
+        var updatedUser models.UserResponse
+        json.NewDecoder(resp.Body).Decode(&updatedUser)
+        assert.Equal(t, "Jane", updatedUser.FirstName)
+        assert.Equal(t, "Smith", updatedUser.LastName)
+    })
     
+}
+
+func TestClearUsersTable(t *testing.T) {
+    var count int64
+    storage.Database=setupTestDatabase()
+    result := storage.Database.Exec("DELETE FROM users")
+    assert.NoError(t, result.Error, "Clearing users table should not produce an error")
+
+    // Verify the table is empty
+    storage.Database.Model(&models.User{}).Count(&count)
+    assert.Equal(t, int64(0), count, "Users table should be empty after clearing")
+}
+
+func TestMain(m *testing.M) {
     code := m.Run()
 
+    
     if storage.Database != nil {
         db, _ := storage.Database.DB()
         db.Close()
     }
-
     os.Exit(code)
 }
