@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -13,7 +14,17 @@ import (
 )
 
 func GetUser(ctx *fiber.Ctx) error {
-	
+
+	if ctx.Method()==fiber.MethodPut{
+		UpdateUser(ctx)
+		return nil
+	}
+
+	if ctx.Method() != fiber.MethodGet {
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
+
 	if len(ctx.Body())>0 {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Bad Request with error" : "Request has a payload"})
 	}
@@ -34,6 +45,11 @@ func GetUser(ctx *fiber.Ctx) error {
 }
 
 func CreateUser(ctx *fiber.Ctx) error {
+
+	if ctx.Method()!=fiber.MethodPost{
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
 	var user = new(models.User)
 	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
 	j.DisallowUnknownFields()
@@ -74,8 +90,15 @@ func CreateUser(ctx *fiber.Ctx) error {
 		log.Println("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
-	ctx.Status(http.StatusCreated)
-	return nil
+	fmt.Println(&user)
+	return ctx.Status(http.StatusCreated).JSON(models.UserResponse{
+		ID: user.ID,
+		Email: user.Email,
+		FirstName: user.FirstName,
+		LastName: user.LastName,
+		AccountCreated: user.AccountCreated,
+		AccountUpdated: user.AccountUpdated,
+	})
 }
 
 func UpdateUser(ctx *fiber.Ctx)error{
@@ -130,13 +153,12 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		log.Println("Cannot update the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update user"})
 	}
-	return ctx.Status(http.StatusOK).JSON(models.UserResponse{
-		ID: olduser.ID,
-		Email: olduser.Email,
-		FirstName: input.FirstName,
-		LastName: input.LastName,
-		AccountCreated: input.AccountCreated,
-		AccountUpdated: input.AccountUpdated,
-	})
+	ctx.Status(http.StatusOK)
+	return nil
 	
+}
+
+func ErrorPath(ctx *fiber.Ctx) error{
+	ctx.Status(http.StatusNotFound)
+	return nil
 }
