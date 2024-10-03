@@ -221,7 +221,7 @@ func TestGetUser(t *testing.T) {
 
     t.Run("Request With Payload", func(t *testing.T) {
         req := httptest.NewRequest("GET", "/v1/user/self", strings.NewReader("payload"))
-        req.Header.Set("Authorization", createAuthHeader(user.Email, "password"))
+        req.Header.Set("Authorization", createAuthHeader(user.Email, user.Password))
         resp, _ := app.Test(req)
 
         assert.Equal(t, fiber.StatusBadRequest, resp.StatusCode)
@@ -229,7 +229,7 @@ func TestGetUser(t *testing.T) {
 
     t.Run("Request With Query Parameters", func(t *testing.T) {
         req := httptest.NewRequest("GET", "/v1/user/self?param=value", nil)
-        req.Header.Set("Authorization", createAuthHeader(user.Email, "password"))
+        req.Header.Set("Authorization", createAuthHeader(user.Email, user.Password))
         resp, _ := app.Test(req)
 
         assert.Equal(t, fiber.StatusBadRequest, resp.StatusCode)
