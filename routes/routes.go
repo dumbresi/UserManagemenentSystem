@@ -9,7 +9,7 @@ import (
 func SetupRoutes(app *fiber.App) {
 	app.All("/healthz/", controllers.CheckHealth)
 	app.All("healthz/*", controllers.ErrorHealthCheck)
-	app.All("v1/user/self",middleware.BasicAuthMiddleware,controllers.GetUser)
-	app.All("/v1/user",controllers.CreateUser)
-	app.All("v1/user/self/*",middleware.BasicAuthMiddleware,controllers.ErrorPath)
+	app.All("v1/user/self",middleware.ConnectionCheck,middleware.BasicAuthMiddleware,controllers.GetUser)
+	app.All("/v1/user",middleware.ConnectionCheck,controllers.CreateUser)
+	app.All("v1/user/self/*",middleware.ConnectionCheck,middleware.BasicAuthMiddleware,controllers.ErrorPath)
 }

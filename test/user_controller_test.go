@@ -138,7 +138,7 @@ func TestCreateUser(t *testing.T) {
         req.Header.Set("Content-Type", "application/json")
         resp, _ := app.Test(req)
 
-        assert.Equal(t, fiber.StatusInternalServerError, resp.StatusCode)
+        assert.Equal(t, fiber.StatusBadRequest, resp.StatusCode)
     })
 }
 
