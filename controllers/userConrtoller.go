@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -61,6 +62,9 @@ func CreateUser(ctx *fiber.Ctx) error {
 		}
 	}
 	
+	if user.ID != "" || !user.AccountCreated.IsZero() || !user.AccountUpdated.IsZero() {
+        return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Request contains disallowed fields"})
+    }
 
 	if err != nil {
 		log.Println("Failed to parse Response")
@@ -123,6 +127,10 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error": "Request has query parameters"})
 	}
 
+	if input.ID != "" || !input.AccountCreated.IsZero() || !input.AccountUpdated.IsZero() {
+        return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Request contains disallowed fields"})
+    }
+
 	if(input.Email!=""){
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error":"Cannot change email"})
 	}
@@ -146,6 +154,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		input.LastName=olduser.LastName
 	}
 
+
 	updatedUser:=models.User{
 		ID: olduser.ID,
 		Email: olduser.Email,
@@ -153,7 +162,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		FirstName: input.FirstName,
 		LastName: input.LastName,
 		AccountCreated: olduser.AccountCreated,
-		AccountUpdated: input.AccountUpdated,
+		AccountUpdated: time.Now(),
 	}
 	err=storage.Database.Save(&updatedUser).Error
 	if(err!=nil){
@@ -162,7 +171,6 @@ func UpdateUser(ctx *fiber.Ctx)error{
 	}
 	ctx.Status(http.StatusOK)
 	return nil
-	
 }
 
 func ErrorPath(ctx *fiber.Ctx) error{
