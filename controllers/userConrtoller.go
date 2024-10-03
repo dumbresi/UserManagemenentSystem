@@ -122,7 +122,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		Password: input.Password,
 		FirstName: input.FirstName,
 		LastName: input.LastName,
-		AccountCreated: input.AccountCreated,
+		AccountCreated: olduser.AccountCreated,
 		AccountUpdated: input.AccountUpdated,
 	}
 	err=storage.Database.Save(&updatedUser).Error
