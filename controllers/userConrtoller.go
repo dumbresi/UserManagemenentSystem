@@ -157,3 +157,8 @@ func UpdateUser(ctx *fiber.Ctx)error{
 	return nil
 	
 }
+
+func ErrorPath(ctx *fiber.Ctx) error{
+	ctx.Status(http.StatusNotFound)
+	return nil
+}
