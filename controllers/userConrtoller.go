@@ -54,6 +54,13 @@ func CreateUser(ctx *fiber.Ctx) error {
 	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
 	j.DisallowUnknownFields()
 	err := j.Decode(&user)
+	var existingUser,er=storage.GetUserByEmail(ctx,user.Email)
+	if(er ==nil){
+		if(user.Email==existingUser.Email){
+			return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error":"Email already exist"})
+		}
+	}
+	
 
 	if err != nil {
 		log.Println("Failed to parse Response")
