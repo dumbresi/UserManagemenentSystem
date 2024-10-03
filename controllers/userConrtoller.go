@@ -48,7 +48,6 @@ func CreateUser(ctx *fiber.Ctx) error {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error": "Request has query parameters"})
 	}
 
-	// validating the fields
 	if user.FirstName == "" || user.LastName == "" || user.Email == "" || user.Password == "" {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": "First name, last name, email, and password are required fields",
