@@ -14,7 +14,17 @@ import (
 )
 
 func GetUser(ctx *fiber.Ctx) error {
-	
+
+	if ctx.Method()==fiber.MethodPut{
+		UpdateUser(ctx)
+		return nil
+	}
+
+	if ctx.Method() != fiber.MethodGet {
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
+
 	if len(ctx.Body())>0 {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Bad Request with error" : "Request has a payload"})
 	}
@@ -35,6 +45,11 @@ func GetUser(ctx *fiber.Ctx) error {
 }
 
 func CreateUser(ctx *fiber.Ctx) error {
+
+	if ctx.Method()!=fiber.MethodPost{
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
 	var user = new(models.User)
 	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
 	j.DisallowUnknownFields()
