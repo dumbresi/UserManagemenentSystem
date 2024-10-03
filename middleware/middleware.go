@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/service"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -53,4 +54,13 @@ func BasicAuthMiddleware(ctx *fiber.Ctx) error{
 	})
 
 
+}
+
+func ConnectionCheck(ctx *fiber.Ctx)error{
+	err:=storage.PingDb()
+	if(err!=nil){
+		ctx.Status(fiber.StatusServiceUnavailable)
+		return nil
+	}
+	return ctx.Next()
 }
