@@ -26,11 +26,11 @@ var db *gorm.DB
 
 func setupTestDatabase() *gorm.DB {
     config := storage.Config{
-        Host:     "localhost",
-        Port:     "5432",
-        User:     "sid",
-        Password: "sidd",
-        DbName:   "webapp",
+        Host:     os.Getenv("DB_Host"),
+		Port:     os.Getenv("DB_Port"),
+		User:     os.Getenv("DB_User"),
+		Password: os.Getenv("DB_Password"),
+		DbName:   os.Getenv("DB_Name"),
         SSLMode:  "disable",
     }
 
@@ -64,7 +64,17 @@ func setupTestDatabase() *gorm.DB {
     }
 
     log.Println("Successfully connected to the database")
+    AutoMigrate()
     return db
+}
+
+func AutoMigrate()error{
+    err:=db.AutoMigrate(&models.User{})
+    if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
 
 
