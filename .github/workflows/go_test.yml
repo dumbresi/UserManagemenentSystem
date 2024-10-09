@@ -55,5 +55,5 @@ jobs:
           DB_Password: ${{ secrets.DB_Password }}
           DB_Name: ${{ secrets.DB_Name }}
           DB_Host: 127.0.0.1
-          DB_PORT: ${{ secrets.DB_PORT }}
+          DB_PORT: 5432
         run: go test ./...
