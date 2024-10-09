@@ -15,6 +15,7 @@ import (
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -25,6 +26,11 @@ var app *fiber.App
 var db *gorm.DB
 
 func setupTestDatabase() *gorm.DB {
+    er := godotenv.Load("../.env")
+	if er != nil {
+		log.Print("error loading env")
+	}
+
     config := storage.Config{
         Host:     os.Getenv("DB_Host"),
 		Port:     "5432",
