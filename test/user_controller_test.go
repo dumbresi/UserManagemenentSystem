@@ -15,6 +15,7 @@ import (
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -25,20 +26,26 @@ var app *fiber.App
 var db *gorm.DB
 
 func setupTestDatabase() *gorm.DB {
+    er := godotenv.Load("../.env")
+	if er != nil {
+		log.Print("error loading env")
+	}
+
     config := storage.Config{
-        Host:     "localhost",
-        Port:     "5432",
-        User:     "sid",
-        Password: "sidd",
-        DbName:   "webapp",
+        Host:     os.Getenv("DB_Host"),
+		Port:     "5432",
+		User:     os.Getenv("DB_User"),
+		Password: os.Getenv("DB_Password"),
+		DbName:   os.Getenv("DB_Name"),
         SSLMode:  "disable",
     }
+
+    fmt.Printf("Host: %s, Port: %s, User: %s, Password: %sDbName: %s\n", config.Host, config.Port, config.User, config.Password, config.DbName)
 
     dsn := fmt.Sprintf(
         "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
         config.Host, config.Port, config.User, config.Password, config.DbName, config.SSLMode,
     )
-
     
     var err error
 
@@ -64,7 +71,17 @@ func setupTestDatabase() *gorm.DB {
     }
 
     log.Println("Successfully connected to the database")
+    AutoMigrate()
     return db
+}
+
+func AutoMigrate()error{
+    err:=db.AutoMigrate(&models.User{})
+    if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
 
 
