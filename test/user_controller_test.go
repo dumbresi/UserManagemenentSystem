@@ -27,7 +27,7 @@ var db *gorm.DB
 func setupTestDatabase() *gorm.DB {
     config := storage.Config{
         Host:     os.Getenv("DB_Host"),
-		Port:     os.Getenv("DB_Port"),
+		Port:     "5432",
 		User:     os.Getenv("DB_User"),
 		Password: os.Getenv("DB_Password"),
 		DbName:   os.Getenv("DB_Name"),
