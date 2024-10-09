@@ -34,12 +34,12 @@ func setupTestDatabase() *gorm.DB {
         SSLMode:  "disable",
     }
 
+    fmt.Printf("Host: %s, Port: %s, User: %s, DbName: %s\n", config.Host, config.Port, config.User, config.DbName)
+
     dsn := fmt.Sprintf(
         "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
         config.Host, config.Port, config.User, config.Password, config.DbName, config.SSLMode,
     )
-    log.Println(config.User)
-    log.Println(config.User)
     
     var err error
 
