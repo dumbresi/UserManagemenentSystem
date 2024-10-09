@@ -38,7 +38,8 @@ func setupTestDatabase() *gorm.DB {
         "host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
         config.Host, config.Port, config.User, config.Password, config.DbName, config.SSLMode,
     )
-
+    log.Println(config.User)
+    log.Println(config.User)
     
     var err error
 
