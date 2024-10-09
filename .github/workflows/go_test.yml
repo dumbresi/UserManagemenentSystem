@@ -24,6 +24,8 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
+          --log_statement=all  # Enable verbose logging to see all SQL statements
+          --log_connections=on  # Log connection attempts
         ports:
           - 5432:5432
 
