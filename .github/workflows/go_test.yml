@@ -46,6 +46,8 @@ jobs:
           psql -U postgres -h 127.0.0.1 -p 5432 -c "CREATE USER ${{ secrets.DB_User }} WITH PASSWORD '${{ secrets.DB_Password }}';"
           
           psql -U postgres -h 127.0.0.1 -p 5432 -c "CREATE DATABASE ${{ secrets.DB_Name }};"
+
+          psql -U postgres -h 127.0.0.1 -p 5432 -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.DB_Name }} To ${{ secrets.DB_User }};"
           
           psql -U postgres -h 127.0.0.1 -p 5432 -c "ALTER DATABASE ${{ secrets.DB_Name }} OWNER TO ${{ secrets.DB_User }};"
 
