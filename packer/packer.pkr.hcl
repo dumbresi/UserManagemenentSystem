@@ -17,14 +17,16 @@ source "amazon-ebs" "ubuntu-ebs" {
 }
 
 build {
-  name    = "my-ubuntu-24.04-lts-ami"
+  name    = "sid-ubuntu-24.04-lts-ami"
   sources = ["source.amazon-ebs.ubuntu-ebs"]
 
   provisioner "shell" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt install postgresql postgresql-contrib -y"
-    ]
+    script = "./scripts/vm_setup.sh"
   }
+
+  provisioner "shell" {
+    script = "./scripts/postgres_setup.sh"
+  }
+
 }
 
