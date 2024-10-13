@@ -25,12 +25,21 @@ build {
   }
 
   provisioner "shell" {
+    script = "./scripts/createUser.sh"
+  }
+
+  provisioner "shell" {
     script = "./scripts/postgres_setup.sh"
   }
 
   provisioner "file" {
     source      = "../webapp"
     destination = "/tmp/webapp"
+  }
+
+  provisioner "file" {
+    source      = "webapp.service"
+    destination = "/tmp/webapp.service"
   }
 
   provisioner "file" {
