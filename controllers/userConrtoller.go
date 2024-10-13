@@ -169,7 +169,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		log.Println("Cannot update the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update user"})
 	}
-	ctx.Status(http.StatusOK)
+	ctx.Status(http.StatusNoContent)
 	return nil
 }
 
