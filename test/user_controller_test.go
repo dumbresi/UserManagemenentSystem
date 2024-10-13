@@ -281,7 +281,7 @@ func TestUpdateUser(t *testing.T){
         req.Header.Set("Authorization", createAuthHeader(user.Email, user.Password))
         resp, _ := app.Test(req)
 
-        assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+        assert.Equal(t, fiber.StatusNoContent, resp.StatusCode)
 
         var updatedUser models.User
         
