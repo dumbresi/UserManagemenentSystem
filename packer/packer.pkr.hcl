@@ -28,5 +28,14 @@ build {
     script = "./scripts/postgres_setup.sh"
   }
 
+  provisioner "file" {
+    source      = "../webapp"
+    destination = "/tmp/webapp"
+  }
+
+  provisioner "shell" {
+    script = "./scripts/binary.sh"
+  }
+
 }
 
