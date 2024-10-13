@@ -1,0 +1,33 @@
+name: Packer_Validate
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+    packer_validate:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
+
+        - name: Setup Packer
+          uses: hashicorp/setup-packer@main
+          id: setup_packer
+
+        - name: Packer Init
+          id: init_packer
+          run: "packer init ./packer/packer.pkr.hcl"
+
+        - name: Packer fmt
+          id: fmt_packer
+          run: |
+            cd ./packer
+            packer fmt -check .
+
+        - name: Packer Validate
+          id: validate_packer
+          run: |
+            set -e
+            cd ./packer
+            packer validate .
