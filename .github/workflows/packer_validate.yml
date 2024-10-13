@@ -23,11 +23,11 @@ jobs:
           id: fmt_packer
           run: |
             cd ./packer
-            packer fmt -check ./packer/packer.pkr.hcl  .
+            packer fmt -check .
 
         - name: Packer Validate
           id: validate_packer
           run: |
             set -e
             cd ./packer
-            packer validate ./packer/packer.pkr.hcl .
+            packer validate .
