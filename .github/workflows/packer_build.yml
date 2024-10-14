@@ -18,6 +18,14 @@ jobs:
               echo "DB_Name=${{ secrets.DB_Name }}" >> .env
               echo "DB_Host=127.0.0.1" >> .env
               echo "DB_PORT=5432" >> .env
+
+          - name: Setup Packer
+            uses: hashicorp/setup-packer@main
+            id: setup_packer
+    
+          - name: Packer Init
+            id: init_packer
+            run: "packer init ./packer/packer.pkr.hcl"
           
           - name: Build Go Binary for Linux
             run: |
