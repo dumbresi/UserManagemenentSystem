@@ -1,0 +1,35 @@
+name: Packer Build Workdflow
+
+on:
+  pull_request:
+    branches: ["main"]
+
+jobs:
+    packer-build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Create .env file
+            run: |
+              echo "DB_User=${{ secrets.DB_User }}" >> .env
+              echo "DB_Password=${{ secrets.DB_Password }}" >> .env
+              echo "DB_Name=${{ secrets.DB_Name }}" >> .env
+              echo "DB_Host=127.0.0.1" >> .env
+              echo "DB_PORT=5432" >> .env
+          
+          - name: Build Go Binary for Linux
+            run: |
+              GOOS=linux GOARCH=amd64 go build -o webapp main.go
+
+              cd packer
+              packer build packer.pkr.hcl
+
+              sudo systemctl daemon-reload
+
+              sudo systemctl enable webapp
+
+              sudo systemctl start webapp
+
+
