@@ -13,3 +13,18 @@ variable "ami_region" {
   type    = string
   default = "us-east-2"
 }
+
+variable "aws_profile" {
+  type    = string
+  default = "dev"
+}
+
+variable "source_ami" {
+  type    = string
+  default = "ami-0866a3c8686eaeeba"
+}
+
+variable "ssh_username" {
+  type    = string
+  default = "ubuntu"
+}
