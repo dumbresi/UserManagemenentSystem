@@ -16,7 +16,7 @@ jobs:
               echo "DB_User=${{ secrets.DB_User }}" >> .env
               echo "DB_Password=${{ secrets.DB_Password }}" >> .env
               echo "DB_Name=${{ secrets.DB_Name }}" >> .env
-              echo "DB_Host="localhost"" >> .env
+              echo "DB_Host=localhost" >> .env
               echo "DB_PORT=5432" >> .env
 
           - name: Setup Packer
@@ -41,10 +41,18 @@ jobs:
               cd packer
               packer build packer.pkr.hcl
 
+              echo "packer built passed"
+
               sudo systemctl daemon-reload
+
+              echo "daemon reload done"
 
               sudo systemctl enable webapp
 
+              echo "enable webapp done"
+
               sudo systemctl start webapp
+
+              echo "systemctl start webapp done"
 
 
