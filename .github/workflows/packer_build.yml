@@ -1,0 +1,46 @@
+name: Packer Build Workdflow
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+    packer-build:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v4
+
+          - name: Create .env file
+            run: |
+              echo "DB_User="${{ secrets.DB_User }}"" >> .env
+              echo "DB_Password="${{ secrets.DB_Password }}"" >> .env
+              echo "DB_Name="${{ secrets.DB_Name }}"" >> .env
+              echo "DB_Host="localhost"" >> .env
+              echo "DB_Port="${{secrets.DB_PORT}}"" >> .env
+              echo "DB_SslMode= "disable"" >> .env
+              echo "App_Port=":3000"" >> .env
+
+          - name: Setup Packer
+            uses: hashicorp/setup-packer@main
+            id: setup_packer
+    
+          - name: Packer Init
+            id: init_packer
+            run: "packer init ./packer/packer.pkr.hcl"
+          
+          - name: AWS Credentials Configuration
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              aws-region: ${{ secrets.AWS_AMI_REGION}}
+
+          - name: Build Go Binary for Linux
+            run: |
+              GOOS=linux GOARCH=amd64 go build -o webapp main.go
+
+              cd packer
+              packer build packer.pkr.hcl
+
+              echo "packer built passed"

@@ -51,5 +51,9 @@ build {
     script = "./scripts/binary.sh"
   }
 
+  provisioner "shell" {
+    script = "./scripts/startAppService.sh"
+  }
+
 }
 
