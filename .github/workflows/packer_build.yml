@@ -13,12 +13,12 @@ jobs:
 
           - name: Create .env file
             run: |
-              echo "DB_User=${{ secrets.DB_User }}" >> .env
-              echo "DB_Password=${{ secrets.DB_Password }}" >> .env
-              echo "DB_Name=${{ secrets.DB_Name }}" >> .env
-              echo "DB_Host=localhost" >> .env
-              echo "DB_PORT=${{secrets.DB_PORT}}" >> .env
-              echo "DB_SslMode="disable"" >> .env
+              echo "DB_User="${{ secrets.DB_User }}"" >> .env
+              echo "DB_Password="${{ secrets.DB_Password }}"" >> .env
+              echo "DB_Name="${{ secrets.DB_Name }}"" >> .env
+              echo "DB_Host="localhost"" >> .env
+              echo "DB_PORT="${{secrets.DB_PORT}}"" >> .env
+              echo "DB_SslMode= "disable"" >> .env
               echo "App_Port=":3000"" >> .env
 
           - name: Setup Packer
