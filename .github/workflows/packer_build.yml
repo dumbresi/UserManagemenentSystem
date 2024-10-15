@@ -18,6 +18,8 @@ jobs:
               echo "DB_Name=${{ secrets.DB_Name }}" >> .env
               echo "DB_Host=localhost" >> .env
               echo "DB_PORT=${{secrets.DB_PORT}}" >> .env
+              echo "DB_SslMode="disable"" >> .env
+              echo "App_Port=":3000"" >> .env
 
           - name: Setup Packer
             uses: hashicorp/setup-packer@main
