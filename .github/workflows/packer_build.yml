@@ -17,7 +17,7 @@ jobs:
               echo "DB_Password="${{ secrets.DB_Password }}"" >> .env
               echo "DB_Name="${{ secrets.DB_Name }}"" >> .env
               echo "DB_Host="localhost"" >> .env
-              echo "DB_PORT="${{secrets.DB_PORT}}"" >> .env
+              echo "DB_Port="${{secrets.DB_PORT}}"" >> .env
               echo "DB_SslMode= "disable"" >> .env
               echo "App_Port=":3000"" >> .env
 
