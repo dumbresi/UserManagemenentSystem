@@ -7,13 +7,17 @@ packer {
   }
 }
 
+locals {
+  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
+}
+
 source "amazon-ebs" "ubuntu-ebs" {
-  ami_name      = "my-default-ami"
-  instance_type = "t2.micro"
-  region        = "us-east-1"
-  profile       = "dev"
-  source_ami    = "ami-0866a3c8686eaeeba"
-  ssh_username  = "ubuntu"
+  ami_name      = "${var.ami_name} - ${local.timestamp}"
+  instance_type = "${var.instance_type}"
+  region        = "${var.ami_region}"
+  profile       = "${var.aws_profile}"
+  source_ami    = "${var.source_ami}"
+  ssh_username  = "${var.ssh_username}"
 }
 
 build {
@@ -55,4 +59,31 @@ build {
     script = "./scripts/startAppService.sh"
   }
 
+}
+
+
+variable "source_ami" {
+  type    = string
+  default = "ami-0866a3c8686eaeeba"
+}
+
+variable "ami_name" {
+  type        = string
+  description = "this is the name of the AMI"
+}
+
+variable "instance_type" {
+  type = string
+}
+
+variable "ami_region" {
+  type = string
+}
+
+variable "aws_profile" {
+  type = string
+}
+
+variable "ssh_username" {
+  type = string
 }

@@ -35,6 +35,13 @@ jobs:
             
         - name: Packer Validate
           id: validate_packer
+          env:
+            PKR_VAR_ami_name: ${{ secrets.AMI_NAME }}
+            PKR_VAR_instance_type: ${{secrets.AMI_INSTANCE_TYPE}}
+            PKR_VAR_ami_region: ${{secrets.AWS_AMI_REGION}}
+            PKR_VAR_aws_profile: ${{secrets.AWS_PROFILE}}
+            PKR_VAR_source_ami: ${{secrets.SOURCE_AMI}}
+            PKR_VAR_ssh_username: ${{secrets.AMI_SSH_USERNAME}}
           run: |
             set -e
             cd ./packer
