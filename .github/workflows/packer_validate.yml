@@ -42,6 +42,7 @@ jobs:
             PKR_VAR_aws_profile: ${{secrets.AWS_PROFILE}}
             PKR_VAR_source_ami: ${{secrets.SOURCE_AMI}}
             PKR_VAR_ssh_username: ${{secrets.AMI_SSH_USERNAME}}
+            PKR_VAR_ami_shared_users: "[${{ secrets.AWS_DEMO_ACCOUNT_ID }}]"
           run: |
             set -e
             cd ./packer

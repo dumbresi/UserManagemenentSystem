@@ -18,6 +18,7 @@ source "amazon-ebs" "ubuntu-ebs" {
   profile       = "${var.aws_profile}"
   source_ami    = "${var.source_ami}"
   ssh_username  = "${var.ssh_username}"
+  ami_users     = "${var.ami_shared_users}"
 }
 
 build {
@@ -87,3 +88,8 @@ variable "aws_profile" {
 variable "ssh_username" {
   type = string
 }
+
+variable "ami_shared_users" {
+  type = list(string)
+}
+
