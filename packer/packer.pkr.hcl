@@ -92,3 +92,4 @@ variable "ssh_username" {
 variable "ami_shared_users" {
   type = list(string)
 }
+
