@@ -30,8 +30,10 @@ jobs:
             echo "DB_User=${{ secrets.DB_User }}" >> .env
             echo "DB_Password=${{ secrets.DB_Password }}" >> .env
             echo "DB_Name=${{ secrets.DB_Name }}" >> .env
-            echo "DB_Host=localhost" >> .env
+            echo "DB_Host=${{ secrets.DB_HOST }}" >> .env
             echo "DB_Port=5432" >> .env
+            echo "DB_SslMode= "disable"" >> .env
+            echo "App_Port="${{secrets.SERVER_PORT}}"" >> .env
             
         - name: Packer Validate
           id: validate_packer
