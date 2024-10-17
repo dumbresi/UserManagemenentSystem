@@ -13,6 +13,7 @@ locals {
 
 source "amazon-ebs" "ubuntu-ebs" {
   ami_name      = "${var.ami_name} - ${local.timestamp}"
+  subnet_id     = "${var.subnet_id}"
   instance_type = "${var.instance_type}"
   region        = "${var.ami_region}"
   profile       = "${var.aws_profile}"
@@ -93,3 +94,7 @@ variable "ami_shared_users" {
   type = list(string)
 }
 
+variable "subnet_id" {
+  type    = string
+  default = "subnet-06ddfbabda19fc6b2"
+}
