@@ -89,6 +89,6 @@ variable "ssh_username" {
   type = string
 }
 
-variable "ami_shared_users"{
-  type= list(string)
+variable "ami_shared_users" {
+  type = list(string)
 }
