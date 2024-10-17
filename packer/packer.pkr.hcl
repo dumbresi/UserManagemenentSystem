@@ -73,17 +73,17 @@ variable "ami_name" {
 }
 
 variable "instance_type" {
-  type    = string
+  type = string
 }
 
 variable "ami_region" {
-  type    = string
+  type = string
 }
 
 variable "aws_profile" {
-  type    = string
+  type = string
 }
 
 variable "ssh_username" {
-  type    = string
+  type = string
 }
