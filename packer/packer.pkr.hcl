@@ -34,10 +34,6 @@ build {
     script = "./scripts/createUser.sh"
   }
 
-  provisioner "shell" {
-    script = "./scripts/postgres_setup.sh"
-  }
-
   provisioner "file" {
     source      = "../webapp"
     destination = "/tmp/webapp"
@@ -46,11 +42,6 @@ build {
   provisioner "file" {
     source      = "webapp.service"
     destination = "/tmp/webapp.service"
-  }
-
-  provisioner "file" {
-    source      = "../.env"
-    destination = "/tmp/.env"
   }
 
   provisioner "shell" {
@@ -72,26 +63,32 @@ variable "source_ami" {
 variable "ami_name" {
   type        = string
   description = "this is the name of the AMI"
+  default="my_ami"
 }
 
 variable "instance_type" {
   type = string
+  default="t2.micro"
 }
 
 variable "ami_region" {
   type = string
+  default="us-east-1"
 }
 
 variable "aws_profile" {
   type = string
+  default="dev"
 }
 
 variable "ssh_username" {
   type = string
+  default="ubuntu"
 }
 
 variable "ami_shared_users" {
   type = list(string)
+  default=["920372991622"]
 }
 
 variable "subnet_id" {
