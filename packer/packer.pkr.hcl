@@ -13,7 +13,7 @@ locals {
 
 source "amazon-ebs" "ubuntu-ebs" {
   ami_name      = "${var.ami_name} - ${local.timestamp}"
-  subnet_id     = "${varr.subnet_id}"
+  subnet_id     = "${var.subnet_id}"
   instance_type = "${var.instance_type}"
   region        = "${var.ami_region}"
   profile       = "${var.aws_profile}"
