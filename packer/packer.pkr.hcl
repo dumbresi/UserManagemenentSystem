@@ -30,7 +30,7 @@ build {
     script = "./scripts/vm_setup.sh"
   }
 
-  provisioner "shell" {
+    provisioner "shell" {
     script = "./scripts/createUser.sh"
   }
 
