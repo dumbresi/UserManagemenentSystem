@@ -63,32 +63,32 @@ variable "source_ami" {
 variable "ami_name" {
   type        = string
   description = "this is the name of the AMI"
-  default="my_ami"
+  default     = "my_ami"
 }
 
 variable "instance_type" {
-  type = string
-  default="t2.micro"
+  type    = string
+  default = "t2.micro"
 }
 
 variable "ami_region" {
-  type = string
-  default="us-east-1"
+  type    = string
+  default = "us-east-1"
 }
 
 variable "aws_profile" {
-  type = string
-  default="dev"
+  type    = string
+  default = "dev"
 }
 
 variable "ssh_username" {
-  type = string
-  default="ubuntu"
+  type    = string
+  default = "ubuntu"
 }
 
 variable "ami_shared_users" {
-  type = list(string)
-  default=["920372991622"]
+  type    = list(string)
+  default = ["920372991622"]
 }
 
 variable "subnet_id" {
