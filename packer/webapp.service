@@ -1,5 +1,6 @@
 [Unit]
 Description=My webapp service
+ConditionPathExists=/usr/bin/.env
 After=network.target
 
 [Service]
