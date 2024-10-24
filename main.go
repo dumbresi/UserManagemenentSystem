@@ -21,5 +21,5 @@ func main() {
 		log.Print("Error loading Env")
 		return
 	}
-	app.Listen(os.Getenv("App_Port"))
+	app.Listen(":"+os.Getenv("App_Port"))
 }
