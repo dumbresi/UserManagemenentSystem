@@ -60,8 +60,12 @@ func NewConnection() error {
 	return nil
 }
 
-func MigrateDb()error {
+func MigrateDb() error {
 	err:=models.MigrateUser(Database)
+	if(err!=nil){
+		log.Print("Cannot migrate User DB")
+    }
+	err= models.MigrateImage(Database)
 	return err
 }
 
