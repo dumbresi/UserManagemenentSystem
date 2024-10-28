@@ -62,6 +62,38 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	return nil
 }
 
+func GetProfilePic(ctx *fiber.Ctx) error{
+	if ctx.Method() != fiber.MethodGet {
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
+
+	if len(ctx.Body())>0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Bad Request with error" : "Request has a payload"})
+	}
+
+	if len(ctx.Queries()) > 0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error": "Request has query parameters"})
+	}
+
+	
+	var user= ctx.Locals("user").(models.User)
+	profilePic,err:= storage.GetProfilePicByUserId(ctx,user.ID)
+	if(err!=nil){
+		ctx.Status(http.StatusNotFound)
+		return nil
+	}
+
+	ctx.Status(http.StatusOK).JSON(fiber.Map{
+		"file_name": profilePic.FileName,
+		"id": profilePic.ID,
+		"url": profilePic.URL,
+		"upload_date": profilePic.UploadDate,
+		"user_id": profilePic.UserID,
+	})
+
+	return nil
+}
 
 func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (string, error){
 	fileContent, err:=file.Open()
