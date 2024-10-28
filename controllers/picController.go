@@ -28,11 +28,19 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
     if err != nil {
         return ctx.Status(fiber.StatusBadRequest).SendString("No file uploaded")
     }
+	existingImage, er:=storage.GetProfilePicByUserId(ctx,user.ID)
+	
+	if(er==nil && existingImage.UserID!=""){
+		storage.DeleteProfilePicbyId(ctx,existingImage.ID)
+		DeleteExistingPic(s3Client,bucketName, existingImage)
+	}
 
 	s3URL, err := UploadToS3(s3Client, file,user.ID)
+
 	if err != nil {
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to upload image to S3")
     }
+
 	var image models.Image
 
 	image.UserID= user.ID
@@ -76,4 +84,16 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
 
     s3URL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucketName, key)
     return s3URL, nil
+}
+
+func DeleteExistingPic(s3Client *s3.Client,bucketName string, image models.Image) error{
+	objectKey:=image.UserID+"/"+image.ID;
+	_, err := s3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+        Bucket: &bucketName,
+        Key:    &objectKey,
+    })
+    if err != nil {
+        return err
+    }
+	return nil
 }
