@@ -11,5 +11,5 @@ func SetupRoutes(app *fiber.App) {
 	app.All("healthz/*", controllers.ErrorHealthCheck)
 	app.All("v1/user/self",middleware.ConnectionCheck,middleware.BasicAuthMiddleware,controllers.GetUser)
 	app.All("/v1/user",middleware.ConnectionCheck,controllers.CreateUser)
-	app.All("v1/user/self/*",middleware.ConnectionCheck,middleware.BasicAuthMiddleware,controllers.ErrorPath)
+	app.Post("v1/user/self/pic",middleware.BasicAuthMiddleware,controllers.UploadProfilePic)
 }

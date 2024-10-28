@@ -1,9 +1,11 @@
 package models
 
 import (
-    "time"
-    "github.com/google/uuid"
-    "gorm.io/gorm"
+	"log"
+	"time"
+
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 )
 
 type Image struct {
@@ -19,4 +21,13 @@ func (image *Image) BeforeCreate(tx *gorm.DB) (err error) {
 		image.ID = uuid.New().String()
 	}
     return
+}
+
+func MigrateImage(db *gorm.DB) error {
+	err := db.AutoMigrate(&Image{})
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
 }
