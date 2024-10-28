@@ -95,6 +95,39 @@ func GetProfilePic(ctx *fiber.Ctx) error{
 	return nil
 }
 
+func DeleteProfilePic(ctx *fiber.Ctx) error{
+	if ctx.Method() != fiber.MethodDelete {
+		ctx.Status(fiber.StatusMethodNotAllowed)
+		return nil
+	}
+
+	if len(ctx.Queries()) > 0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error": "Request has query parameters"})
+	}
+
+	var user= ctx.Locals("user").(models.User)
+	profilePic,err:= storage.GetProfilePicByUserId(ctx,user.ID)
+	if(err!=nil){
+		ctx.Status(http.StatusNotFound)
+		return nil
+	}
+	err=DeleteExistingPic(s3Client,bucketName,profilePic)
+	if(err!=nil){
+		log.Print("Cannot delete profilePic from Bucket")
+		ctx.Status(http.StatusInternalServerError)
+		return nil
+	}
+
+	err=storage.DeleteProfilePicbyId(ctx,profilePic.ID)
+	if(err!=nil){
+		log.Println("Cannot delete profilePic from DB")
+		ctx.Status(http.StatusInternalServerError)
+		return nil
+	}
+	ctx.Status(http.StatusNoContent)
+	return nil
+}
+
 func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (string, error){
 	fileContent, err:=file.Open()
 	if err != nil {

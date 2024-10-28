@@ -13,4 +13,5 @@ func SetupRoutes(app *fiber.App) {
 	app.All("/v1/user",middleware.ConnectionCheck,controllers.CreateUser)
 	app.Post("v1/user/self/pic",middleware.BasicAuthMiddleware,controllers.UploadProfilePic)
 	app.Get("v1/user/self/pic",middleware.BasicAuthMiddleware,controllers.GetProfilePic)
+	app.Delete("v1/user/self/pic",middleware.BasicAuthMiddleware,controllers.DeleteProfilePic)
 }
