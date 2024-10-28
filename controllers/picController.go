@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"mime/multipart"
+	"net/http"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -39,10 +40,17 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	image.FileName=file.Filename
 
 	
+	
     if err := storage.Database.Create(&image).Error; err != nil {
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to save image data in database")
     }
-
+	ctx.Status(http.StatusCreated).JSON(fiber.Map{
+		"file_name": image.FileName,
+		"id": image.ID,
+		"url": image.URL,
+		"upload_date": image.UploadDate,
+		"user_id": image.UserID,
+	})
 	return nil
 }
 
