@@ -60,8 +60,12 @@ func NewConnection() error {
 	return nil
 }
 
-func MigrateDb()error {
+func MigrateDb() error {
 	err:=models.MigrateUser(Database)
+	if(err!=nil){
+		log.Print("Cannot migrate User DB")
+    }
+	err= models.MigrateImage(Database)
 	return err
 }
 
@@ -92,4 +96,34 @@ func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 		return models.User{}, err
 	}
 	return user, nil
+}
+
+func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
+	if Database == nil {
+		log.Print("DB object is not initialized")
+		return errors.New("DB object is not initialized")
+	}
+	var image models.Image
+	err:= Database.Where("id = ?",imageId).Delete(&image).Error
+	if(err!=nil){
+		return err
+	}
+
+	return nil
+}
+
+func GetProfilePicByUserId(ctx *fiber.Ctx, userId string) (models.Image, error){
+	if Database == nil {
+		log.Print("DB object is not initialized")
+		return models.Image{}, errors.New("DB object is not initialized")
+	}
+
+	var image models.Image
+	err:= Database.Where("user_id = ?",userId).First(&image).Error
+	if(err!=nil){
+		log.Println("Pofile pic does not exist for this user")
+		return image, err
+	}
+	
+	return image, nil
 }

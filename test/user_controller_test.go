@@ -81,6 +81,11 @@ func AutoMigrate()error{
 		log.Println(err)
 		return err
 	}
+    err= db.AutoMigrate(&models.Image{})
+    if err != nil {
+		log.Println(err)
+		return err
+	}
 	return nil
 }
 

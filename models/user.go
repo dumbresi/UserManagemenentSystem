@@ -15,7 +15,7 @@ type User struct {
 	FirstName      string    `gorm:"size:255" json:"first_name"`
 	LastName       string    `gorm:"size:255" json:"last_name"`
 	AccountCreated time.Time `gorm:"autoCreateTime" json:"account_created"`
-	AccountUpdated time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	AccountUpdated time.Time `gorm:"autoUpdateTime" json:"account_updated"`
 }
 
 type UserResponse struct {
@@ -24,7 +24,7 @@ type UserResponse struct {
 	FirstName      string    `gorm:"size:255" json:"first_name"`
 	LastName       string    `gorm:"size:255" json:"last_name"`
 	AccountCreated time.Time `gorm:"autoCreateTime" json:"account_created"`
-	AccountUpdated time.Time `gorm:"autoUpdateTime" json:"updated_at"`
+	AccountUpdated time.Time `gorm:"autoUpdateTime" json:"account_updated"`
 }
 
 func MigrateUser(db *gorm.DB) error {
