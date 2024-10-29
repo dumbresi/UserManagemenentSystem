@@ -53,17 +53,17 @@ build {
   }
 
   provisioner "shell" {
-    script= "./scripts/installCloudWatch.sh"
+    script = "./scripts/installCloudWatch.sh"
   }
 
   provisioner "shell" {
-    script= "./scripts/cloudWatchConfig.sh"
+    script = "./scripts/cloudWatchConfig.sh"
   }
 
   provisioner "shell" {
-    "inline"= [
-    "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
-  ]
+    inline = [
+      "sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json"
+    ]
   }
 
 }
