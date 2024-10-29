@@ -2,10 +2,12 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"mime/multipart"
 	"net/http"
+	"strings"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -24,6 +26,10 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
         return ctx.Status(fiber.StatusUnauthorized).SendString("User not found")
     }
 
+	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
+	j.DisallowUnknownFields()
+	j.Decode(&models.Image{})
+
 	file, err := ctx.FormFile("profilePic")
     if err != nil {
         return ctx.Status(fiber.StatusBadRequest).SendString("No file uploaded")
@@ -38,7 +44,8 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	s3URL, err := UploadToS3(s3Client, file,user.ID)
 
 	if err != nil {
-        return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to upload image to S3")
+		log.Println("Failed to upload image data in bucket")
+        return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to upload image")
     }
 
 	var image models.Image
@@ -47,10 +54,9 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	image.URL=s3URL
 	image.FileName=file.Filename
 
-	
-	
     if err := storage.Database.Create(&image).Error; err != nil {
-        return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to save image data in database")
+		log.Println("Failed to save image data in DB")
+        return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to save image data")
     }
 	ctx.Status(http.StatusCreated).JSON(fiber.Map{
 		"file_name": image.FileName,
@@ -103,6 +109,10 @@ func DeleteProfilePic(ctx *fiber.Ctx) error{
 
 	if len(ctx.Queries()) > 0 {
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error": "Request has query parameters"})
+	}
+
+	if len(ctx.Body())>0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Bad Request with error" : "Request has a payload"})
 	}
 
 	var user= ctx.Locals("user").(models.User)
