@@ -11,7 +11,7 @@ import (
 
 func InitS3Client() *s3.Client {
 
-    err := godotenv.Load()
+    err := godotenv.Load("../.env")
     if err != nil {
         log.Fatalf("Error loading .env file")
     }
