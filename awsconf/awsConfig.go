@@ -10,7 +10,8 @@ import (
 
 func InitS3Client() *s3.Client {
     
-	cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
+	// cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
+	cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithRegion("us-east-1"))
 	if err != nil {
 		log.Printf("unable to load SDK config, %v", err)
 	}
