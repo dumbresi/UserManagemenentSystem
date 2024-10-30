@@ -157,7 +157,7 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
         return "", err
     }
 
-    s3URL := fmt.Sprintf("https://%s.s3.amazonaws.com/%s", bucketName, key)
+    s3URL := fmt.Sprintf("https://%s.s3."+s3Client.Options().Region+"amazonaws.com/%s", bucketName, key)
     return s3URL, nil
 }
 
