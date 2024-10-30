@@ -1,4 +1,4 @@
-name: Go CI with PostgreSQL
+name: Go Test
 
 on:
   pull_request:

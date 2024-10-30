@@ -1,4 +1,4 @@
-name: Go-pr-check
+name: Go-Build
 
 on:
   pull_request:
