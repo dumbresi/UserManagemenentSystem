@@ -4,12 +4,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
-
+    "github.com/rs/zerolog/log"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/controllers"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/middleware"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -56,21 +55,21 @@ func setupTestDatabase() *gorm.DB {
             
             pingErr := sqlDB.Ping()
             if pingErr == nil {
-                log.Println("Database connection is already alive")
+                log.Info().Msg("Database connection is already alive")
                 return db 
             } else {
-                log.Println("Database ping failed, reopening connection...")
+                log.Warn().Msg("Database ping failed, reopening connection...")
             }
         }
     }
 
     db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
     if err != nil {
-        log.Fatalf("Failed to connect to the database: %v", err)
+        log.Error().Err(err).Msg("Failed to connect to the database")
         return nil
     }
 
-    log.Println("Successfully connected to the database")
+    log.Info().Msg("Successfully connected to the database")
     AutoMigrate()
     return db
 }
@@ -78,12 +77,12 @@ func setupTestDatabase() *gorm.DB {
 func AutoMigrate()error{
     err:=db.AutoMigrate(&models.User{})
     if err != nil {
-		log.Println(err)
+		log.Error().Err(err)
 		return err
 	}
     err= db.AutoMigrate(&models.Image{})
     if err != nil {
-		log.Println(err)
+		log.Error().Err(err)
 		return err
 	}
 	return nil

@@ -3,9 +3,8 @@ package storage
 import (
 	"errors"
 	"fmt"
-	"log"
 	"os"
-
+	"github.com/rs/zerolog/log"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
@@ -28,7 +27,7 @@ func NewConnection() error {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Print("error loading env")
+		log.Error().Msg("error loading env")
 		return err
 	}
 
@@ -50,11 +49,12 @@ func NewConnection() error {
 
 	if er != nil {
 		log.Print("Failed to connect to the database", err)
+		log.Error().Msg("Failed to connect to the database")
 		return er
 	}
 	er=MigrateDb()
 	if(er!=nil){
-		log.Println("Error migrating the database")
+		log.Error().Msg("Error migrating the database")
 	}
 
 	return nil
@@ -64,8 +64,12 @@ func MigrateDb() error {
 	err:=models.MigrateUser(Database)
 	if(err!=nil){
 		log.Print("Cannot migrate User DB")
+		log.Error().Msg("Cannt migrate Users table")
     }
 	err= models.MigrateImage(Database)
+	if(err!=nil){
+		log.Error().Msg("Cannt migrate Images table")
+	}
 	return err
 }
 
@@ -100,7 +104,7 @@ func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 
 func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
 	if Database == nil {
-		log.Print("DB object is not initialized")
+		log.Error().Msg("DB object is not initialized")
 		return errors.New("DB object is not initialized")
 	}
 	var image models.Image
@@ -114,14 +118,14 @@ func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
 
 func GetProfilePicByUserId(ctx *fiber.Ctx, userId string) (models.Image, error){
 	if Database == nil {
-		log.Print("DB object is not initialized")
+		log.Error().Msg("DB object is not initialized")
 		return models.Image{}, errors.New("DB object is not initialized")
 	}
 
 	var image models.Image
 	err:= Database.Where("user_id = ?",userId).First(&image).Error
 	if(err!=nil){
-		log.Println("Pofile pic does not exist for this user")
+		log.Info().Msg("Pofile pic does not exist for this user")
 		return image, err
 	}
 	

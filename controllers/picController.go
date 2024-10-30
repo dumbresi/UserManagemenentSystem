@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
+	"github.com/rs/zerolog/log"
 	"mime/multipart"
 	"net/http"
 	"strings"
@@ -44,7 +44,7 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	s3URL, err := UploadToS3(s3Client, file,user.ID)
 
 	if err != nil {
-		log.Println("Failed to upload image data in bucket")
+		log.Error().Msg("Failed to upload image data in bucket")
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to upload image")
     }
 
@@ -55,7 +55,7 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	image.FileName=file.Filename
 
     if err := storage.Database.Create(&image).Error; err != nil {
-		log.Println("Failed to save image data in DB")
+		log.Error().Msg("Failed to save image data in DB")
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to save image data")
     }
 	ctx.Status(http.StatusCreated).JSON(fiber.Map{
@@ -130,7 +130,7 @@ func DeleteProfilePic(ctx *fiber.Ctx) error{
 
 	err=storage.DeleteProfilePicbyId(ctx,profilePic.ID)
 	if(err!=nil){
-		log.Println("Cannot delete profilePic from DB")
+		log.Error().Msg("Cannot delete profilePic from DB")
 		ctx.Status(http.StatusInternalServerError)
 		return nil
 	}
@@ -168,6 +168,7 @@ func DeleteExistingPic(s3Client *s3.Client,bucketName string, image models.Image
         Key:    &objectKey,
     })
     if err != nil {
+		log.Error().Str("Objkey",objectKey).Msg("Error deleting the pic from bucket")
         return err
     }
 	return nil
