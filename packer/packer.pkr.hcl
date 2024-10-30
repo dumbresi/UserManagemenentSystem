@@ -56,17 +56,13 @@ build {
     script = "./scripts/installCloudWatch.sh"
   }
 
-  provisioner "shell" {
-    script = "./scripts/cloudWatchConfig.sh"
-  }
-
   provisioner "file" {
     source      = "./scripts/cloudwatch-config.json"
     destination = "/tmp/cloudwatch-config.json"
   }
 
   provisioner "shell" {
-    source = "./scripts/cloudWatchConfig.sh"
+    script = "./scripts/cloudWatchConfig.sh"
   }
 
   provisioner "shell" {
