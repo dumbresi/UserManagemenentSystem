@@ -27,7 +27,7 @@ func NewConnection() error {
 
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Error().Msg("error loading env")
+		log.Error().Err(err).Msg("error loading env")
 		return err
 	}
 
@@ -49,12 +49,12 @@ func NewConnection() error {
 
 	if er != nil {
 		log.Print("Failed to connect to the database", err)
-		log.Error().Msg("Failed to connect to the database")
+		log.Error().Err(err).Msg("Failed to connect to the database")
 		return er
 	}
 	er=MigrateDb()
 	if(er!=nil){
-		log.Error().Msg("Error migrating the database")
+		log.Error().Err(err).Msg("Error migrating the database")
 	}
 
 	return nil
@@ -64,11 +64,11 @@ func MigrateDb() error {
 	err:=models.MigrateUser(Database)
 	if(err!=nil){
 		log.Print("Cannot migrate User DB")
-		log.Error().Msg("Cannt migrate Users table")
+		log.Error().Err(err).Msg("Cannt migrate Users table")
     }
 	err= models.MigrateImage(Database)
 	if(err!=nil){
-		log.Error().Msg("Cannt migrate Images table")
+		log.Error().Err(err).Msg("Cannt migrate Images table")
 	}
 	return err
 }
@@ -76,11 +76,13 @@ func MigrateDb() error {
 func PingDb() error {
 	sqlDB, err := Database.DB()
 	if err != nil {
+		log.Error().Err(err).Msg("failed to retreive database")
 		return fmt.Errorf("failed to retrieve database object: %w", err)
 	}
 
 	err = sqlDB.Ping()
 	if err != nil {
+		log.Error().Err(err).Msg("failed to ping database")
 		return fmt.Errorf("failed to ping database: %w", err)
 	}
 
@@ -89,7 +91,7 @@ func PingDb() error {
 
 func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 	if Database == nil {
-		log.Print("DB object is not initialized")
+		log.Error().Msg("DB object is not initialized")
 		return models.User{}, errors.New("DB object is not initialized")
 	}
 

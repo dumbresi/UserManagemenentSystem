@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/middleware"
@@ -10,6 +9,7 @@ import (
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 
 	err:=godotenv.Load(".env")
 	if(err!=nil){
-		log.Print("Error loading Env")
+		log.Error().Err(err).Msg("Error loading Env")
 		return
 	}
 	app.Listen(":"+os.Getenv("App_Port"))

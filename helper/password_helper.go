@@ -1,8 +1,10 @@
 package helper
 
 import (
-    "golang.org/x/crypto/bcrypt"
-    "regexp"
+	"regexp"
+
+	"github.com/rs/zerolog/log"
+	"golang.org/x/crypto/bcrypt"
 )
 
 
@@ -10,6 +12,7 @@ func HashPassword(password string) (string, error) {
     
     hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
     if err != nil {
+        log.Error().Err(err).Msg("Cannot bcrypt the password")
         return "", err
     }
     return string(hashedPassword), nil
