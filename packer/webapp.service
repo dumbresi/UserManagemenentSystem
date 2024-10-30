@@ -11,8 +11,8 @@ WorkingDirectory=/usr/bin/
 ExecStart=/usr/bin/webapp
 Restart=on-failure
 RestartSec=60
-StandardOutput=syslog
-StandardError=syslog
+StandardOutput=append:/var/log/webapp/csye6225.log
+StandardError=append:/var/log/webapp/csye6225.log
 SyslogIdentifier=webapp
 
 [Install]
