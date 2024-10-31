@@ -18,7 +18,7 @@ import (
 )
 
 var s3Client= awsconf.InitS3Client()
-var bucketName string= "sidd1234"
+var bucketName string= awsconf.GetBucketName()
 
 func UploadProfilePic(ctx *fiber.Ctx) error{
 	user, ok := ctx.Locals("user").(models.User)
@@ -37,8 +37,7 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	existingImage, er:=storage.GetProfilePicByUserId(ctx,user.ID)
 	
 	if(er==nil && existingImage.UserID!=""){
-		storage.DeleteProfilePicbyId(ctx,existingImage.ID)
-		DeleteExistingPic(s3Client,bucketName, existingImage)
+		return ctx.Status(fiber.StatusConflict).SendString("Profile Picture already exists")
 	}
 
 	s3URL, err := UploadToS3(s3Client, file,user.ID)
@@ -86,6 +85,7 @@ func GetProfilePic(ctx *fiber.Ctx) error{
 	var user= ctx.Locals("user").(models.User)
 	profilePic,err:= storage.GetProfilePicByUserId(ctx,user.ID)
 	if(err!=nil){
+		log.Error().Err(err).Msg("User not found")
 		ctx.Status(http.StatusNotFound)
 		return nil
 	}
@@ -141,7 +141,7 @@ func DeleteProfilePic(ctx *fiber.Ctx) error{
 func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (string, error){
 	fileContent, err:=file.Open()
 	if err != nil {
-		log.Print(err.Error())
+		log.Error().Err(err).Msg("Error opening the image file")
         return "", err
     }
 	defer fileContent.Close()
@@ -157,12 +157,13 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
         return "", err
     }
 
-    s3URL := fmt.Sprintf("https://%s.s3."+s3Client.Options().Region+"amazonaws.com/%s", bucketName, key)
+	s3URL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, s3Client.Options().Region, key)
+    // s3URL := fmt.Sprintf("https://%s.s3."+s3Client.Options().Region+"amazonaws.com/%s", bucketName, key)
     return s3URL, nil
 }
 
 func DeleteExistingPic(s3Client *s3.Client,bucketName string, image models.Image) error{
-	objectKey:=image.UserID+"/"+image.ID;
+	objectKey:=fmt.Sprintf(image.UserID+"/"+image.ID);
 	_, err := s3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
         Bucket: &bucketName,
         Key:    &objectKey,
