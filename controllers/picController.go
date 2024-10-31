@@ -35,7 +35,21 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 
 	var image models.Image
 
-	file, err := ctx.FormFile("profilePic")
+	form, err := ctx.MultipartForm()
+    if err != nil {
+        return ctx.Status(fiber.StatusBadRequest).SendString("Error parsing form data")
+    }
+
+    files := form.File["profilePic"]
+    if len(files) == 0 {
+        return ctx.Status(fiber.StatusBadRequest).SendString("No file uploaded")
+    }
+    if len(files) > 1 {
+        return ctx.Status(fiber.StatusBadRequest).SendString("Only one image file is allowed")
+    }
+
+    file := files[0]
+
     if err != nil {
         return ctx.Status(fiber.StatusBadRequest).SendString("No file uploaded")
     }
@@ -131,7 +145,8 @@ func DeleteProfilePic(ctx *fiber.Ctx) error{
 		ctx.Status(http.StatusNotFound)
 		return nil
 	}
-	err=DeleteExistingPic(s3Client,bucketName,profilePic)
+	log.Print("Before deleting existing pic")
+	err=DeleteExistingPic(ctx,s3Client,bucketName,profilePic)
 	if(err!=nil){
 		log.Print("Cannot delete profilePic from Bucket")
 		ctx.Status(http.StatusInternalServerError)
@@ -170,19 +185,22 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
     }
 
 	s3URL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", bucketName, s3Client.Options().Region, key)
-    // s3URL := fmt.Sprintf("https://%s.s3."+s3Client.Options().Region+"amazonaws.com/%s", bucketName, key)
     return s3URL, nil
 }
 
-func DeleteExistingPic(s3Client *s3.Client,bucketName string, image models.Image) error{
-	objectKey:=fmt.Sprintf(image.UserID+"/"+image.ID);
+func DeleteExistingPic(ctx *fiber.Ctx,s3Client *s3.Client,bucketName string, image models.Image) error{
+	log.Printf("delete Existing Pic %s : %v",bucketName,s3Client)
+	objectKey:=fmt.Sprintf(image.UserID+"/"+image.FileName);
 	startTime:=time.Now()
-	_, err := s3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
+	resp, err := s3Client.DeleteObject(ctx.Context(), &s3.DeleteObjectInput{
         Bucket: &bucketName,
         Key:    &objectKey,
     })
+	log.Printf("Response of delete %v",resp.ResultMetadata)
+	log.Printf("delete object %s : %s",bucketName,objectKey)
 	stats.TimeS3Call("delete_image",startTime,time.Now())
     if err != nil {
+		log.Printf("Not able to delete object %s : %s",bucketName,objectKey)
 		log.Error().Str("Objkey",objectKey).Msg("Error deleting the pic from bucket")
         return err
     }
