@@ -14,9 +14,11 @@ func MetricsMiddleware(c *fiber.Ctx) error {
 
     endpoint := c.Path()
 
-    stats.CountAPICall(endpoint)
+    method:=c.Method()
 
-    stats.TimeAPICall(endpoint, start)
+    stats.CountAPICall(method+"."+endpoint)
+
+    stats.TimeAPICall(method+"."+endpoint, start)
 
     return err
 }

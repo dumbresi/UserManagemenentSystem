@@ -34,9 +34,9 @@ func TimeAPICall(endpoint string, start time.Time) {
 }
 
 func TimeDataBaseQuery(query string, start time.Time, end time.Time){
-	statsdClient.Timing("db.query_time."+query, int64(end.Sub(start)))
+	statsdClient.PrecisionTiming("db.query_time."+query, time.Duration(time.Since(start).Milliseconds()))
 }
 
 func TimeS3Call(query string, start time.Time, end time.Time){
-	statsdClient.Timing("s3.response_time."+query, int64(end.Sub(start)))
+	statsdClient.PrecisionTiming("s3.response_time."+query, time.Duration(time.Since(start).Milliseconds()))
 }
