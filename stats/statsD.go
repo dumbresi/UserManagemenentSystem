@@ -32,3 +32,11 @@ func TimeAPICall(endpoint string, start time.Time) {
 	log.Info().Msg("Time API")
 	statsdClient.Timing("api.response_time."+endpoint, int64(elapsed))
 }
+
+func TimeDataBaseQuery(query string, start time.Time, end time.Time){
+	statsdClient.Timing("db.query_time."+query, int64(end.Sub(start)))
+}
+
+func TimeS3Call(query string, start time.Time, end time.Time){
+	statsdClient.Timing("s3.response_time."+query, int64(end.Sub(start)))
+}

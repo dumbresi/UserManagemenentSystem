@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"github.com/rs/zerolog/log"
+	"time"
+
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -96,7 +99,9 @@ func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 	}
 
 	var user models.User
+	startTime:= time.Now()
 	err := Database.Where("email = ?", email).First(&user).Error; 
+	stats.TimeDataBaseQuery("get_user",startTime,time.Now())
 	if err != nil {
 		log.Print("Error getting the user by username")
 		return models.User{}, err
@@ -110,7 +115,9 @@ func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
 		return errors.New("DB object is not initialized")
 	}
 	var image models.Image
+	startTime:= time.Now()
 	err:= Database.Where("id = ?",imageId).Delete(&image).Error
+	stats.TimeDataBaseQuery("delete_pic_by_Id",startTime,time.Now())
 	if(err!=nil){
 		return err
 	}
@@ -119,17 +126,22 @@ func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
 }
 
 func GetProfilePicByUserId(ctx *fiber.Ctx, userId string) (models.Image, error){
+	
 	if Database == nil {
 		log.Error().Msg("DB object is not initialized")
 		return models.Image{}, errors.New("DB object is not initialized")
 	}
 
 	var image models.Image
+	startTime:= time.Now()
+
 	err:= Database.Where("user_id = ?",userId).First(&image).Error
+
+	stats.TimeDataBaseQuery("get_pic_by_userId",startTime,time.Now())
+
 	if(err!=nil){
 		log.Info().Msg("Pofile pic does not exist for this user")
 		return image, err
 	}
-	
 	return image, nil
 }
