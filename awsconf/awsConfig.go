@@ -14,9 +14,10 @@ var bucketName string
 
 func InitS3Client() *s3.Client {
 
-    err:=godotenv.Load(".env")
+    err:=godotenv.Load("../.env")
 	if(err!=nil){
 		log.Error().Err(err).Msg("Error loading Env")
+		return nil
 	}
 
 	bucketName= os.Getenv("S3_Bucket_Name")

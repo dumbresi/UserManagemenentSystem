@@ -57,4 +57,5 @@ jobs:
           DB_Name: ${{ secrets.DB_Name }}
           DB_Host: 127.0.0.1
           DB_Port: "5432"
+          S3_Bucket_Name: sidd1234
         run: go test ./...
