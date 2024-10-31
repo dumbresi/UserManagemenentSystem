@@ -34,9 +34,6 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 	j.DisallowUnknownFields()
 
 	var image models.Image
-    if err := j.Decode(&image); err != nil {
-        return ctx.Status(fiber.StatusBadRequest).SendString("Invalid JSON format")
-    }
 
 	file, err := ctx.FormFile("profilePic")
     if err != nil {
