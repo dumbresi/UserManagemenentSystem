@@ -8,13 +8,15 @@ import (
 	"os"
 	"strings"
 	"testing"
-    "github.com/rs/zerolog/log"
+
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/controllers"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/middleware"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -29,6 +31,7 @@ func setupTestDatabase() *gorm.DB {
 	if er != nil {
 		log.Print("error loading env")
 	}
+    stats.InitStatsDClient()
 
     config := storage.Config{
         Host:     os.Getenv("DB_Host"),
