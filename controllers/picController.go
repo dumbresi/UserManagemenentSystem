@@ -49,10 +49,7 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
     }
 
     file := files[0]
-
-    if err != nil {
-        return ctx.Status(fiber.StatusBadRequest).SendString("No file uploaded")
-    }
+	
 	existingImage, er:=storage.GetProfilePicByUserId(ctx,user.ID)
 	
 	if(er==nil && existingImage.UserID!=""){
