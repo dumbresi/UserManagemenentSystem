@@ -3,6 +3,7 @@ package stats
 import (
 	"time"
 
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"github.com/smira/go-statsd"
 )
@@ -10,8 +11,14 @@ import (
 var statsdClient *statsd.Client
 
 func InitStatsDClient() {
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
+    // Set the time field format to UTC
+    zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
 	statsdClient= statsd.NewClient("localhost:8125", statsd.MaxPacketSize(1400),
 	statsd.MetricPrefix("web."))
+	log.Info().Msg("Logging started")
 	log.Info().Msg("StatsD client initlaized")
 }
 
