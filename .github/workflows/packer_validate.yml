@@ -34,6 +34,7 @@ jobs:
             echo "DB_Port=5432" >> .env
             echo "DB_SslMode= "disable"" >> .env
             echo "App_Port="${{secrets.SERVER_PORT}}"" >> .env
+            echo "S3_Bucket_Name=sidd1234" >> .env
             
         - name: Packer Validate
           id: validate_packer

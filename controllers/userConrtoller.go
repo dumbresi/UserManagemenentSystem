@@ -10,6 +10,7 @@ import (
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
 )
@@ -95,8 +96,9 @@ func CreateUser(ctx *fiber.Ctx) error {
 	}
 
 	user.Password = hashedPassword
-
+	startTime:= time.Now()
 	err = storage.Database.Create(&user).Error
+	stats.TimeDataBaseQuery("create_user",startTime,time.Now())
 	if err != nil {
 		log.Println("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
@@ -164,7 +166,9 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		AccountCreated: olduser.AccountCreated,
 		AccountUpdated: time.Now(),
 	}
+	startTime:=time.Now()
 	err=storage.Database.Save(&updatedUser).Error
+	stats.TimeDataBaseQuery("create_user",startTime,time.Now())
 	if(err!=nil){
 		log.Println("Cannot update the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update user"})

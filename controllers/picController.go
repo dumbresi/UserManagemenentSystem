@@ -4,13 +4,17 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/rs/zerolog/log"
 	"mime/multipart"
 	"net/http"
 	"strings"
+	"time"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -28,7 +32,8 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 
 	j := json.NewDecoder(strings.NewReader(string(ctx.Body())))
 	j.DisallowUnknownFields()
-	j.Decode(&models.Image{})
+
+	var image models.Image
 
 	file, err := ctx.FormFile("profilePic")
     if err != nil {
@@ -40,6 +45,11 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
 		return ctx.Status(fiber.StatusConflict).SendString("Profile Picture already exists")
 	}
 
+	err=helper.ValidateImageFile(file)
+	if(err!=nil){
+		return ctx.Status(fiber.StatusBadRequest).SendString("Please upload an Image file format")
+	}
+
 	s3URL, err := UploadToS3(s3Client, file,user.ID)
 
 	if err != nil {
@@ -47,13 +57,13 @@ func UploadProfilePic(ctx *fiber.Ctx) error{
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to upload image")
     }
 
-	var image models.Image
-
 	image.UserID= user.ID
 	image.URL=s3URL
 	image.FileName=file.Filename
-
-    if err := storage.Database.Create(&image).Error; err != nil {
+	startTime:= time.Now()
+    err = storage.Database.Create(&image).Error; 
+	stats.TimeDataBaseQuery("create_pic",startTime,time.Now())
+	if err != nil {
 		log.Error().Msg("Failed to save image data in DB")
         return ctx.Status(fiber.StatusInternalServerError).SendString("Failed to save image data")
     }
@@ -146,11 +156,13 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
     }
 	defer fileContent.Close()
 	key:= fmt.Sprintf("%s/%s",userid,file.Filename)
+	startTime:=time.Now()
 	_, err = s3Client.PutObject(context.TODO(), &s3.PutObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(key),
         Body:   fileContent,
 	}) 
+	stats.TimeS3Call("put_image",startTime,time.Now())
 
 	if err != nil {
 		log.Print(err.Error())
@@ -164,10 +176,12 @@ func UploadToS3(s3Client *s3.Client,file *multipart.FileHeader, userid string) (
 
 func DeleteExistingPic(s3Client *s3.Client,bucketName string, image models.Image) error{
 	objectKey:=fmt.Sprintf(image.UserID+"/"+image.ID);
+	startTime:=time.Now()
 	_, err := s3Client.DeleteObject(context.TODO(), &s3.DeleteObjectInput{
         Bucket: &bucketName,
         Key:    &objectKey,
     })
+	stats.TimeS3Call("delete_image",startTime,time.Now())
     if err != nil {
 		log.Error().Str("Objkey",objectKey).Msg("Error deleting the pic from bucket")
         return err
