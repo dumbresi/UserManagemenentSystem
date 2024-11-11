@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/middleware"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/routes"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
@@ -21,6 +22,7 @@ func main() {
 	routes.SetupRoutes(app)
 	
 	stats.InitStatsDClient()
+	
 	app.Use(middleware.MetricsMiddleware)
 
 	err:=godotenv.Load(".env")
@@ -28,5 +30,6 @@ func main() {
 		log.Error().Err(err).Msg("Error loading Env")
 		return
 	}
+	awsconf.InitSNSClient()
 	app.Listen(":"+os.Getenv("App_Port"))
 }

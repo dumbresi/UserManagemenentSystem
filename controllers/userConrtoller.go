@@ -3,16 +3,18 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"log"
+
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/stats"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/storage"
 	"github.com/gofiber/fiber/v2"
+	"github.com/rs/zerolog/log"
 )
 
 func GetUser(ctx *fiber.Ctx) error {
@@ -68,7 +70,7 @@ func CreateUser(ctx *fiber.Ctx) error {
     }
 
 	if err != nil {
-		log.Println("Failed to parse Response")
+		log.Error().Msg("Failed to parse Response")
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Incorrect Request Body"})
 	}
 
@@ -100,8 +102,13 @@ func CreateUser(ctx *fiber.Ctx) error {
 	err = storage.Database.Create(&user).Error
 	stats.TimeDataBaseQuery("create_user",startTime,time.Now())
 	if err != nil {
-		log.Println("Cannot save the user to Database")
+		log.Error().Msg("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
+	}
+
+	err=awsconf.PublishMessage(user.Email)
+	if(err!=nil){
+		log.Error().Err(err).Msg("Unable to publish Message to topic")
 	}
 	fmt.Println(&user)
 	return ctx.Status(http.StatusCreated).JSON(models.UserResponse{
@@ -121,7 +128,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 	err := j.Decode(&input)
 
 	if err != nil {
-		log.Println("Failed to parse Response")
+		log.Error().Msg("Failed to parse Response")
 		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"error": "Incorrect Request Body"})
 	}
 
@@ -170,7 +177,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 	err=storage.Database.Save(&updatedUser).Error
 	stats.TimeDataBaseQuery("create_user",startTime,time.Now())
 	if(err!=nil){
-		log.Println("Cannot update the user to Database")
+		log.Error().Msg("Cannot update the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot update user"})
 	}
 	ctx.Status(http.StatusNoContent)
