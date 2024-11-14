@@ -3,11 +3,9 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-
 	"net/http"
 	"strings"
 	"time"
-
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -105,8 +103,14 @@ func CreateUser(ctx *fiber.Ctx) error {
 		log.Error().Msg("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
+	
+	token,err:= helper.GenerateToken()
 
-	err=awsconf.PublishMessage(user.Email)
+	if(err!=nil){
+		log.Err(err).Msg("error generating token")
+	}
+
+	err=awsconf.PublishMessage(user.Email,token)
 	if(err!=nil){
 		log.Error().Err(err).Msg("Unable to publish Message to topic")
 	}
