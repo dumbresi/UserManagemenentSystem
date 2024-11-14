@@ -67,10 +67,11 @@ func InitSNSClient(){
 func GetSnsClient() *sns.Client{
 	return snsClient
 }
-type EmailAddress struct{
+type SNSMessage struct{
 	Email string
+	Token string
 }
-func PublishMessage(email string)error{
+func PublishMessage(email string,token string)error{
 	err:=godotenv.Load(".env")
 	if(err!=nil){
 		log.Error().Err(err).Msg("Error loading Env for sns")
@@ -78,7 +79,8 @@ func PublishMessage(email string)error{
 	}
 
 	snsTopicArn=os.Getenv("Sns_Topic_Arn")
-	emailData := EmailAddress{Email: email}
+	emailData := SNSMessage{Email: email,
+	Token: token}
 	message, err := json.Marshal(emailData)
 	if err != nil {
 		log.Printf("Failed to marshal email data: %v", err)
