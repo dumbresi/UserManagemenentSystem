@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/awsconf"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/helper"
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/models"
@@ -96,6 +97,17 @@ func CreateUser(ctx *fiber.Ctx) error {
 	}
 
 	user.Password = hashedPassword
+
+	token,err:= helper.GenerateToken()
+	
+	if(err!=nil){
+		log.Err(err).Msg("error generating token")
+	}
+	user.Token=token
+	user.IsVerified=false
+
+	verificationData:=helper.Encode(user.Email,token)
+
 	startTime:= time.Now()
 	err = storage.Database.Create(&user).Error
 	stats.TimeDataBaseQuery("create_user",startTime,time.Now())
@@ -103,14 +115,8 @@ func CreateUser(ctx *fiber.Ctx) error {
 		log.Error().Msg("Cannot save the user to Database")
 		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"error": "Cannot create user"})
 	}
-	
-	token,err:= helper.GenerateToken()
 
-	if(err!=nil){
-		log.Err(err).Msg("error generating token")
-	}
-
-	err=awsconf.PublishMessage(user.Email,token)
+	err=awsconf.PublishMessage(user.Email,verificationData)
 	if(err!=nil){
 		log.Error().Err(err).Msg("Unable to publish Message to topic")
 	}
@@ -174,6 +180,8 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		Password: input.Password,
 		FirstName: input.FirstName,
 		LastName: input.LastName,
+		Token: olduser.Token,
+		IsVerified: olduser.IsVerified,
 		AccountCreated: olduser.AccountCreated,
 		AccountUpdated: time.Now(),
 	}
@@ -186,6 +194,28 @@ func UpdateUser(ctx *fiber.Ctx)error{
 	}
 	ctx.Status(http.StatusNoContent)
 	return nil
+}
+
+func VerifyUser(ctx *fiber.Ctx)error{
+
+	query := ctx.Query("data", "")
+	if(query==""){
+		log.Error().Msg("Error getting the validation query params")
+	}
+	decodedEmail, decodedToken, err := helper.Decode(query)
+
+	if err != nil {
+		log.Error().Err(err)
+	} else {
+		log.Info().Msg(fmt.Sprint("Decoded Email:", decodedEmail))
+		log.Info().Msg(fmt.Sprint("Decoded Token:", decodedToken))
+	}
+	err=storage.ValidateUserToken(decodedEmail,decodedToken)
+	if(err!=nil){
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error":"User Validation Failed"})
+	}
+
+	return ctx.Status(http.StatusOK).JSON(fiber.Map{"Success":"Email Verified"})
 }
 
 func ErrorPath(ctx *fiber.Ctx) error{

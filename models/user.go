@@ -14,6 +14,8 @@ type User struct {
 	Password       string    `json:"password"`
 	FirstName      string    `gorm:"size:255" json:"first_name"`
 	LastName       string    `gorm:"size:255" json:"last_name"`
+	Token 		   string     `gorm:"size:255" json:"token"`
+	IsVerified     bool       `gorm:"type:bool" json:"is_verified"`
 	AccountCreated time.Time `gorm:"autoCreateTime" json:"account_created"`
 	AccountUpdated time.Time `gorm:"autoUpdateTime" json:"account_updated"`
 }
