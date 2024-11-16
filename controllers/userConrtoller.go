@@ -18,11 +18,6 @@ import (
 
 func GetUser(ctx *fiber.Ctx) error {
 
-	if ctx.Method()==fiber.MethodPut{
-		UpdateUser(ctx)
-		return nil
-	}
-
 	if ctx.Method() != fiber.MethodGet {
 		ctx.Status(fiber.StatusMethodNotAllowed)
 		return nil
@@ -197,6 +192,10 @@ func UpdateUser(ctx *fiber.Ctx)error{
 }
 
 func VerifyUser(ctx *fiber.Ctx)error{
+
+	if len(ctx.Body())>0 {
+		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Bad Request with error" : "Request has a payload"})
+	}
 
 	query := ctx.Query("data", "")
 	if(query==""){
