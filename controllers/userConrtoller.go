@@ -200,11 +200,13 @@ func VerifyUser(ctx *fiber.Ctx)error{
 	query := ctx.Query("data", "")
 	if(query==""){
 		log.Error().Msg("Error getting the validation query params")
+		return ctx.Status(http.StatusBadGateway).JSON(fiber.Map{"Error":"Incorrect query parameters passed"})
 	}
 	decodedEmail, decodedToken, err := helper.Decode(query)
 
 	if err != nil {
 		log.Error().Err(err)
+		return ctx.Status(http.StatusInternalServerError).JSON(fiber.Map{"Error":"User Validation Failed"})
 	} else {
 		log.Info().Msg(fmt.Sprint("Decoded Email:", decodedEmail))
 		log.Info().Msg(fmt.Sprint("Decoded Token:", decodedToken))
