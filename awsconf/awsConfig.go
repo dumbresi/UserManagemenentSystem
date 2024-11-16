@@ -18,20 +18,28 @@ var bucketName string
 var s3Client *s3.Client
 var snsTopicArn string
 var snsClient *sns.Client
+var host string
+
+var cfg aws.Config
 
 func InitS3Client() *s3.Client {
 
     err:=godotenv.Load(".env")
 	if(err!=nil){
-		log.Error().Err(err).Msg("Error loading Env")
+		log.Error().Err(err).Msg("Error loading Env for aws")
 		return nil
 	}
 
 	bucketName= os.Getenv("S3_Bucket_Name")
 
-
-	// cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
-	cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithRegion(os.Getenv("AWS_Region")))
+	host=os.Getenv("DB_Host=localhost")
+	if(host=="localhost"){
+		cfg, err = config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
+	}else{
+		cfg, err = config.LoadDefaultConfig(context.TODO(),config.WithRegion(os.Getenv("AWS_Region")))
+	}
+	
+	
 	if err != nil {
 		log.Printf("unable to load SDK config, %v", err)
 	}
@@ -53,9 +61,18 @@ func GetBucketName() string{
 
 
 func InitSNSClient(){
-	// cfg, err := config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
-	cfg, err := config.LoadDefaultConfig(context.TODO(), config.WithRegion(os.Getenv("AWS_Region")))
 
+	err:=godotenv.Load(".env")
+	if(err!=nil){
+		log.Error().Err(err).Msg("Error loading Env for aws")
+	}
+	host=os.Getenv("DB_Host=localhost")
+	if(host=="localhost"){
+		cfg, err = config.LoadDefaultConfig(context.TODO(),config.WithSharedConfigProfile("dev"),config.WithRegion("us-east-1"))
+	}else{
+		cfg, err = config.LoadDefaultConfig(context.TODO(),config.WithRegion(os.Getenv("AWS_Region")))
+	}
+	
 	if err != nil {
 		log.Error().Msg(fmt.Sprintf("unable to load SDK config, %v", err))
 	}

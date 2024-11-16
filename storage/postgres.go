@@ -109,6 +109,33 @@ func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 	return user, nil
 }
 
+func ValidateUserToken(email string, token string) error{
+	if Database == nil {
+		log.Error().Msg("DB object is not initialized")
+		return errors.New("DB object is not initialized")
+	}
+	var user models.User
+	startTime:= time.Now()
+	err := Database.Where("email = ?", email).First(&user).Error;
+	if(err!=nil){
+		return err
+	} 
+	stats.TimeDataBaseQuery("find_user_by_email",startTime,time.Now())
+	if(user.Token!=token){
+		return errors.New("the tokens do not match, user validation failed")
+	}
+
+	user.IsVerified=true
+	startTime= time.Now()
+	err=Database.Save(&user).Error
+	if(err!=nil){
+		return err
+	}
+	stats.TimeDataBaseQuery("validate_user_email",startTime,time.Now())
+
+	return nil
+}
+
 func DeleteProfilePicbyId(ctx *fiber.Ctx, imageId string) error{
 	if Database == nil {
 		log.Error().Msg("DB object is not initialized")
