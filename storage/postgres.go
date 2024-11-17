@@ -112,7 +112,6 @@ func GetUserByEmail(ctx *fiber.Ctx, email string) (models.User, error) {
 func ValidateUserToken(email string, token string) error{
 	if Database == nil {
 		log.Error().Msg("DB object is not initialized")
-		return errors.New("DB object is not initialized")
 	}
 	var user models.User
 	startTime:= time.Now()
@@ -123,6 +122,10 @@ func ValidateUserToken(email string, token string) error{
 	stats.TimeDataBaseQuery("find_user_by_email",startTime,time.Now())
 	if(user.Token!=token){
 		return errors.New("the tokens do not match, user validation failed")
+	}
+
+	if(time.Now().UTC().Sub(user.AccountCreated)>120){
+		return errors.New("token expired")
 	}
 
 	user.IsVerified=true

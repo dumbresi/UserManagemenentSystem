@@ -44,5 +44,13 @@ func (user *User) String() string {
 
 func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
     u.ID = uuid.New().String()
+	u.AccountCreated = time.Now().UTC()
+	u.AccountUpdated = time.Now().UTC()
     return
+}
+
+
+func (u *User) BeforeUpdate(tx *gorm.DB) (err error) {
+	u.AccountUpdated = time.Now().UTC()
+	return
 }

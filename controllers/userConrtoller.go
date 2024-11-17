@@ -178,7 +178,7 @@ func UpdateUser(ctx *fiber.Ctx)error{
 		Token: olduser.Token,
 		IsVerified: olduser.IsVerified,
 		AccountCreated: olduser.AccountCreated,
-		AccountUpdated: time.Now(),
+		AccountUpdated: time.Now().UTC(),
 	}
 	startTime:=time.Now()
 	err=storage.Database.Save(&updatedUser).Error
@@ -212,8 +212,9 @@ func VerifyUser(ctx *fiber.Ctx)error{
 		log.Info().Msg(fmt.Sprint("Decoded Token:", decodedToken))
 	}
 	err=storage.ValidateUserToken(decodedEmail,decodedToken)
+
 	if(err!=nil){
-		return ctx.Status(http.StatusBadRequest).JSON(fiber.Map{"Error":"User Validation Failed"})
+		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"Error":err})
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"Success":"Email Verified"})
