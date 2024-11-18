@@ -43,3 +43,28 @@ jobs:
               packer build packer.pkr.hcl
 
               echo "packer built passed"
+
+          - name: Start Instance Refresh
+            run: |
+              REFRESH_ID=$(aws autoscaling start-instance-refresh \
+                --auto-scaling-group-name "my-asg" \
+                --query "InstanceRefreshId" --output text)
+              echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
+              
+          - name: Wait for Instance Refresh to Complete
+            run: |
+                while true; do
+                  STATUS=$(aws autoscaling describe-instance-refreshes \
+                    --auto-scaling-group-name "my-asg" \
+                    --query "InstanceRefreshes[?InstanceRefreshId=='${{ env.REFRESH_ID }}'].Status" \
+                    --output text)
+                  echo "Current Status: $STATUS"
+                  if [[ "$STATUS" == "Successful" ]]; then
+                    echo "Instance refresh completed successfully."
+                    break
+                  elif [[ "$STATUS" == "Failed" ]]; then
+                    echo "Instance refresh failed."
+                    exit 1
+                  fi
+                  sleep 30 # Wait for 30 seconds before checking again
+                done
