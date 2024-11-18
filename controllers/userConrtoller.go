@@ -214,7 +214,7 @@ func VerifyUser(ctx *fiber.Ctx)error{
 	err=storage.ValidateUserToken(decodedEmail,decodedToken)
 
 	if(err!=nil){
-		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"Error":err})
+		return ctx.Status(http.StatusForbidden).JSON(fiber.Map{"Error":"Token Expired"})
 	}
 
 	return ctx.Status(http.StatusOK).JSON(fiber.Map{"Success":"Email Verified"})

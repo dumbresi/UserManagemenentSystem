@@ -98,6 +98,7 @@ func TestCreateUser(t *testing.T) {
     
     app= fiber.New()
     storage.Database = setupTestDatabase()
+    TestClearUsersTable(t)
     // setupTest()
     app.Post("/v1/user", controllers.CreateUser)
 
@@ -117,9 +118,12 @@ func TestCreateUser(t *testing.T) {
         
         
         err := storage.Database.Where("email = ?", "test@example.com").First(&user).Error
+        user.IsVerified=true
+        storage.Database.Save(&user)
         assert.Nil(t, err)
         assert.Equal(t, "John", user.FirstName)
         assert.Equal(t, "Doe", user.LastName)
+        assert.Equal(t,true,user.IsVerified)
     })
 
    
@@ -176,6 +180,7 @@ func TestGetUser(t *testing.T) {
         FirstName: "John",
         LastName:  "Doe",
     }
+    user.IsVerified=true
 
     app.Get("/v1/user/self", middleware.BasicAuthMiddleware, controllers.GetUser)
 
@@ -188,8 +193,10 @@ func TestGetUser(t *testing.T) {
         req := httptest.NewRequest("GET", "/v1/user/self", nil)
         req.Header.Set("Authorization", createAuthHeader(user.Email, user.Password))
         resp, _ := app.Test(req)
-
+        
         assert.Equal(t, fiber.StatusOK, resp.StatusCode)
+        
+        
 
         var userResp models.UserResponse
         json.NewDecoder(resp.Body).Decode(&userResp)
@@ -303,7 +310,7 @@ func TestUpdateUser(t *testing.T){
 func TestClearUsersTable(t *testing.T) {
     var count int64
     storage.Database=setupTestDatabase()
-    result := storage.Database.Exec("DELETE FROM users")
+    result := storage.Database.Exec("DELETE FROM users WHERE email = ?", "test@example.com")
     assert.NoError(t, result.Error, "Clearing users table should not produce an error")
 
     // Verify the table is empty

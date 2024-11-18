@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/base64"
+	"net/http"
 	"strings"
 
 	"github.com/CSYE-6225-CLOUD-SIDDHARTH/webapp/service"
@@ -45,6 +46,9 @@ func BasicAuthMiddleware(ctx *fiber.Ctx) error{
 	password := credentials[1]
 	exist,user,validationerror:=service.ValidateUser(ctx,username,password); 
 	if exist {
+		if(!user.IsVerified){
+			return ctx.SendStatus(http.StatusForbidden)
+		}
 		ctx.Locals("user",user)
 		return ctx.Next()
 	}
