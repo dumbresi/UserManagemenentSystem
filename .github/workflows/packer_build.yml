@@ -62,12 +62,18 @@ jobs:
           - name: Create New Launch Template Version
             id: create_lt_version
             run: |
+                LATEST_VERSION=$(aws ec2 describe-launch-templates \
+                  --launch-template-names "ec2_lt" \
+                  --query "LaunchTemplates[0].LatestVersionNumber" \
+                  --output text)
+
                 NEW_VERSION=$(aws ec2 create-launch-template-version \
                   --launch-template-name "ec2_lt" \
                   --source-version $LATEST_VERSION \
                   --launch-template-data "{\"ImageId\":\"${{ env.LATEST_AMI }}\"}" \
                   --query "LaunchTemplateVersion.VersionNumber" \
                   --output text)
+                  
                 echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         
             # Step 4: Update Auto Scaling Group with the New Launch Template Version
