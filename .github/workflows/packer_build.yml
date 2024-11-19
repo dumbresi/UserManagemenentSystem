@@ -44,13 +44,6 @@ jobs:
 
               echo "packer built passed"
 
-          - name: DEMO AWS Credentials Configuration
-            uses: aws-actions/configure-aws-credentials@v4
-            with:
-              aws-access-key-id: ${{ secrets.GH_DEMO_AWS_ACCESS_KEY_ID }}
-              aws-secret-access-key: ${{ secrets.GH_DEMO_AWS_SECRET_ACCESS_KEY }}
-              aws-region: ${{ secrets.AWS_AMI_REGION }}
-
           - name: Get Latest AMI ID
             id: get_latest_ami
             run: |
@@ -60,6 +53,13 @@ jobs:
                   --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
                   --output text)
                 echo "LATEST_AMI=$LATEST_AMI" >> $GITHUB_ENV
+
+          - name: DEMO AWS Credentials Configuration
+            uses: aws-actions/configure-aws-credentials@v4
+            with:
+              aws-access-key-id: ${{ secrets.GH_DEMO_AWS_ACCESS_KEY_ID }}
+              aws-secret-access-key: ${{ secrets.GH_DEMO_AWS_SECRET_ACCESS_KEY }}
+              aws-region: ${{ secrets.AWS_AMI_REGION }}
         
             # Step 3: Create a New Launch Template Version with the Latest AMI
           - name: Create New Launch Template Version
