@@ -53,7 +53,7 @@ jobs:
             run: |
                 LATEST_AMI=$(aws ec2 describe-images \
                   --owners self \
-                  --filters "Name=name,Values=my-ami-prefix*" \
+                  --filters "Name=name,Values=${{secrets.AMI_NAME}}*" \
                   --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
                   --output text)
                 echo "LATEST_AMI=$LATEST_AMI" >> $GITHUB_ENV
@@ -63,7 +63,7 @@ jobs:
             id: create_lt_version
             run: |
                 NEW_VERSION=$(aws ec2 create-launch-template-version \
-                  --launch-template-id lt-1234567890abcdef \
+                  --launch-template-name "ec2_lt" \
                   --source-version $LATEST_VERSION \
                   --launch-template-data "{\"ImageId\":\"${{ env.LATEST_AMI }}\"}" \
                   --query "LaunchTemplateVersion.VersionNumber" \
