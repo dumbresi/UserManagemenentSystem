@@ -22,6 +22,10 @@ jobs:
           - name: AWS Credentials Configuration
             uses: aws-actions/configure-aws-credentials@v4
             with:
+              # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+              # aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              # aws-region: ${{ secrets.AWS_AMI_REGION}}
+
               aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
               aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
               aws-region: ${{ secrets.AWS_AMI_REGION}}
@@ -44,18 +48,50 @@ jobs:
 
               echo "packer built passed"
 
-          - name: Start Instance Refresh
+              - name: Get Latest AMI ID
+              id: get_latest_ami
+              run: |
+                LATEST_AMI=$(aws ec2 describe-images \
+                  --owners self \
+                  --filters "Name=name,Values=my-ami-prefix*" \
+                  --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
+                  --output text)
+                echo "LATEST_AMI=$LATEST_AMI" >> $GITHUB_ENV
+        
+            # Step 3: Create a New Launch Template Version with the Latest AMI
+          - name: Create New Launch Template Version
+            id: create_lt_version
             run: |
-              REFRESH_ID=$(aws autoscaling start-instance-refresh \
-                --auto-scaling-group-name "my-asg" \
-                --query "InstanceRefreshId" --output text)
-              echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
-              
+                NEW_VERSION=$(aws ec2 create-launch-template-version \
+                  --launch-template-id lt-1234567890abcdef \
+                  --source-version $LATEST_VERSION \
+                  --launch-template-data "{\"ImageId\":\"${{ env.LATEST_AMI }}\"}" \
+                  --query "LaunchTemplateVersion.VersionNumber" \
+                  --output text)
+                echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+        
+            # Step 4: Update Auto Scaling Group with the New Launch Template Version
+          - name: Update Auto Scaling Group
+            run: |
+                aws autoscaling update-auto-scaling-group \
+                  --auto-scaling-group-name my-asg \
+                  --launch-template "LaunchTemplateId=lt-1234567890abcdef,Version=${{ env.NEW_VERSION }}"
+        
+            # Step 5: Start Instance Refresh
+          - name: Start Instance Refresh
+            id: start_refresh
+            run: |
+                REFRESH_ID=$(aws autoscaling start-instance-refresh \
+                  --auto-scaling-group-name my-asg \
+                  --query "InstanceRefreshId" --output text)
+                echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
+        
+            # Step 6: Wait for Instance Refresh to Complete
           - name: Wait for Instance Refresh to Complete
             run: |
                 while true; do
                   STATUS=$(aws autoscaling describe-instance-refreshes \
-                    --auto-scaling-group-name "my-asg" \
+                    --auto-scaling-group-name my-asg \
                     --query "InstanceRefreshes[?InstanceRefreshId=='${{ env.REFRESH_ID }}'].Status" \
                     --output text)
                   echo "Current Status: $STATUS"
@@ -66,5 +102,5 @@ jobs:
                     echo "Instance refresh failed."
                     exit 1
                   fi
-                  sleep 30 # Wait for 30 seconds before checking again
+                  sleep 30 # Wait 30 seconds before checking again
                 done
