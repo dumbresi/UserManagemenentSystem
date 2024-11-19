@@ -48,9 +48,9 @@ jobs:
 
               echo "packer built passed"
 
-              - name: Get Latest AMI ID
-              id: get_latest_ami
-              run: |
+          - name: Get Latest AMI ID
+            id: get_latest_ami
+            run: |
                 LATEST_AMI=$(aws ec2 describe-images \
                   --owners self \
                   --filters "Name=name,Values=my-ami-prefix*" \
