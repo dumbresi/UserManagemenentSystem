@@ -74,7 +74,7 @@ jobs:
           - name: Update Auto Scaling Group
             run: |
                 aws autoscaling update-auto-scaling-group \
-                  --auto-scaling-group-name my-asg \
+                  --auto-scaling-group-name csye6225_asg \
                   --launch-template "LaunchTemplateId=lt-1234567890abcdef,Version=${{ env.NEW_VERSION }}"
         
             # Step 5: Start Instance Refresh
@@ -82,7 +82,7 @@ jobs:
             id: start_refresh
             run: |
                 REFRESH_ID=$(aws autoscaling start-instance-refresh \
-                  --auto-scaling-group-name my-asg \
+                  --auto-scaling-group-name csye6225_asg \
                   --query "InstanceRefreshId" --output text)
                 echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
         
@@ -91,7 +91,7 @@ jobs:
             run: |
                 while true; do
                   STATUS=$(aws autoscaling describe-instance-refreshes \
-                    --auto-scaling-group-name my-asg \
+                    --auto-scaling-group-name csye6225_asg \
                     --query "InstanceRefreshes[?InstanceRefreshId=='${{ env.REFRESH_ID }}'].Status" \
                     --output text)
                   echo "Current Status: $STATUS"
