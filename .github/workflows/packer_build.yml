@@ -53,7 +53,7 @@ jobs:
             run: |
                 LATEST_AMI=$(aws ec2 describe-images \
                   --owners self \
-                  --filters "Name=name,Values=my-ami-prefix*" \
+                  --filters "Name=name,Values=${{secrets.AMI_NAME}}*" \
                   --query "Images | sort_by(@, &CreationDate)[-1].ImageId" \
                   --output text)
                 echo "LATEST_AMI=$LATEST_AMI" >> $GITHUB_ENV
