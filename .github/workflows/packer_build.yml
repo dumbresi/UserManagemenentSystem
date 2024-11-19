@@ -81,7 +81,7 @@ jobs:
             run: |
                 aws autoscaling update-auto-scaling-group \
                   --auto-scaling-group-name csye6225_asg \
-                  --launch-template "launchTemplateName=ec2_lt,Version=${{ env.NEW_VERSION }}"
+                  --launch-template "LaunchTemplateName=ec2_lt,Version=${{ env.NEW_VERSION }}"
         
             # Step 5: Start Instance Refresh
           - name: Start Instance Refresh
