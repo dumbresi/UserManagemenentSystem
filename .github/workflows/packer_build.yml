@@ -61,7 +61,6 @@ jobs:
               aws-secret-access-key: ${{ secrets.GH_DEMO_AWS_SECRET_ACCESS_KEY }}
               aws-region: ${{ secrets.AWS_AMI_REGION }}
         
-            # Step 3: Create a New Launch Template Version with the Latest AMI
           - name: Create New Launch Template Version
             id: create_lt_version
             run: |
@@ -79,7 +78,6 @@ jobs:
 
                 echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
-            # Step 5: Start Instance Refresh
           - name: Start Instance Refresh
             id: start_refresh
             run: |
@@ -88,7 +86,6 @@ jobs:
                   --query "InstanceRefreshId" --output text)
                 echo "REFRESH_ID=$REFRESH_ID" >> $GITHUB_ENV
         
-            # Step 6: Wait for Instance Refresh to Complete
           - name: Wait for Instance Refresh to Complete
             run: |
                 while true; do
